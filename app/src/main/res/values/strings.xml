@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Macro Monitor</string>
+    <string name="title_nutrient_detail">Nutrient Detail</string>
+    <string name="title_activity_simple_xyplot">SimpleXYPlotActivity</string>
+</resources>

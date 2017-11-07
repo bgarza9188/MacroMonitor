@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "859063924417",
+    "project_id": "macro-monitor"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:859063924417:android:ce00304e8f1f75bd",
+        "android_client_info": {
+          "package_name": "com.example.android.macromonitor"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "859063924417-1s50frfugd15aainom2mp1fhv6jk9i2p.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.android.macromonitor",
+            "certificate_hash": "9c8fdd6222b47ae66851d2ada324e8dc8f4ff0ed"
+          }
+        },
+        {
+          "client_id": "859063924417-bhj1e62l0nosvnpqd39qfu4dnk8nmeod.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC1VhgVk52P1_ec_sKPHVm387jnwuZUmS8"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
