@@ -23,7 +23,7 @@
             android:background="@color/off_white"/>
 
         <RelativeLayout
-            android:id="@+id/quardrant_one"
+            android:id="@+id/quadrant_one"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_above="@id/horizontalDivider"
@@ -32,16 +32,16 @@
             android:background="@color/red" >
 
             <TextView
-                android:id="@+id/quardrant_one_text"
+                android:id="@+id/quadrant_one_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
-                android:layout_above="@+id/button"
+                android:layout_above="@+id/quadrant_one_button"
                 android:text="LOADING..."
                 android:textAlignment="center"/>
 
             <Button
-                android:id="@+id/button"
+                android:id="@+id/quadrant_one_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
@@ -49,33 +49,78 @@
         </RelativeLayout>
 
         <RelativeLayout
-            android:id="@+id/quardrant_two"
+            android:id="@+id/quadrant_two"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_above="@id/horizontalDivider"
             android:layout_toRightOf="@id/verticalDivider"
             android:layout_toEndOf="@+id/verticalDivider"
             android:background="@color/white" >
+            <TextView
+                android:id="@+id/quadrant_two_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_above="@+id/quadrant_two_button"
+                android:text="LOADING..."
+                android:textAlignment="center"/>
+
+            <Button
+                android:id="@+id/quadrant_two_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="Button"/>
         </RelativeLayout>
 
         <RelativeLayout
-            android:id="@+id/quardrant_three"
+            android:id="@+id/quadrant_three"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_below="@id/horizontalDivider"
             android:layout_toLeftOf="@id/verticalDivider"
             android:layout_toStartOf="@+id/verticalDivider"
             android:background="@color/blue" >
+            <TextView
+                android:id="@+id/quadrant_three_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_above="@+id/quadrant_three_button"
+                android:text="LOADING..."
+                android:textAlignment="center"/>
+
+            <Button
+                android:id="@+id/quadrant_three_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="Button"/>
         </RelativeLayout>
 
         <RelativeLayout
-            android:id="@+id/quardrant_four"
+            android:id="@+id/quadrant_four"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_below="@id/horizontalDivider"
             android:layout_toRightOf="@id/verticalDivider"
             android:layout_toEndOf="@+id/verticalDivider"
             android:background="@color/green" >
+            <TextView
+                android:id="@+id/quadrant_four_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_above="@+id/quadrant_four_button"
+                android:text="LOADING..."
+                android:textAlignment="center"/>
+
+            <Button
+                android:id="@+id/quadrant_four_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="Button"/>
         </RelativeLayout>
     </RelativeLayout>
 </android.support.constraint.ConstraintLayout>
