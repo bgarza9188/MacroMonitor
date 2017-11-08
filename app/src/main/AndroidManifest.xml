@@ -33,10 +33,6 @@
                 android:value="com.example.android.macromonitor.NutrientListActivity" />
         </activity>
         <activity
-            android:name=".SimpleXYPlotActivity"
-            android:label="@string/title_activity_simple_xyplot"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
             android:name=".BarPlotExampleActivity"
             android:label="Bar Plot Example"
             android:theme="@style/AppTheme.NoActionBar" />

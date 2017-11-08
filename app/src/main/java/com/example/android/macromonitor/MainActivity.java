@@ -10,16 +10,18 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.android.macromonitor.data.MacroContract;
 
-import es.dmoral.toasty.Toasty;
+public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>, MacroConstants{
 
-public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>{
-
-    private static final int MACRO_LOADER = 0;
-
+    private static final int MACRO_LOADER_ONE = 0;
+    private static final int MACRO_LOADER_TWO = 1;
+    private static final int MACRO_LOADER_THREE = 2;
+    private static final int MACRO_LOADER_FOUR = 3;
+    private TextView textView;
 
     private static final String[] MACRO_COLUMNS = {
             MacroContract.MacroEntry.TABLE_NAME + "." + MacroContract.MacroEntry._ID,
@@ -39,33 +41,63 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        textView = findViewById(R.id.quardrant_one_text);
         Button button = findViewById(R.id.button);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                     ContentValues contentValues = new ContentValues();
-                    contentValues.put(MacroContract.MacroEntry.COLUMN_MACRO_NAME, "FAT");
-                    contentValues.put(MacroContract.MacroEntry.COLUMN_INTAKE_VALUE, 2);
-                    contentValues.put(MacroContract.MacroEntry.COLUMN_INTAKE_DATE, "20171231");
+                    contentValues.put(MacroContract.MacroEntry.COLUMN_MACRO_NAME, MACRO_SUGAR_DB_NAME);
+                    contentValues.put(MacroContract.MacroEntry.COLUMN_INTAKE_VALUE, 1);
+                    contentValues.put(MacroContract.MacroEntry.COLUMN_INTAKE_DATE, "20171108");
                     getContentResolver().insert(MacroContract.MacroEntry.CONTENT_URI,contentValues);
             }
         });
+        getSupportLoaderManager().initLoader(MACRO_LOADER_ONE, null, this);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        getSupportLoaderManager().initLoader(MACRO_LOADER, null, this);
     }
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return new CursorLoader(this,
-                MacroContract.MacroEntry.CONTENT_URI,
-                MACRO_COLUMNS,
-                null,
-                null,
-                null);
+        CursorLoader loader;
+        switch (id) {
+            case 0:  loader = new CursorLoader(this,
+                    MacroContract.MacroEntry.CONTENT_URI,
+                    MACRO_COLUMNS,
+                    null,
+                    null,
+                    null);
+                break;
+            case 1: loader = new CursorLoader(this,
+                    MacroContract.MacroEntry.CONTENT_URI,
+                    MACRO_COLUMNS,
+                    "macro_name=" + MACRO_FAT_DB_NAME,
+                    null,
+                    null);
+                break;
+            case 2: loader = new CursorLoader(this,
+                    MacroContract.MacroEntry.CONTENT_URI,
+                    MACRO_COLUMNS,
+                    "macro_name=" + MACRO_CARB_DB_NAME,
+                    null,
+                    null);
+                break;
+            case 3: loader = new CursorLoader(this,
+                    MacroContract.MacroEntry.CONTENT_URI,
+                    MACRO_COLUMNS,
+                    "macro_name=" + MACRO_SUGAR_DB_NAME,
+                    null,
+                    null);
+                break;
+            default: loader = null;
+                break;
+        }
+
+        return loader;
     }
 
     @Override
@@ -75,18 +107,21 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             Toast.makeText(this, "No results",
                     Toast.LENGTH_SHORT).show();
         }else{
-            data.moveToFirst();
-            String name = data.getString(COL_MACRO_NAME);
-            int value = data.getInt(COL_INTAKE_VALUE);
-            String date = data.getString(COL_INTAKE_DATE);
-            Toasty.success(getApplicationContext(), "NAME:" + name + " VALUE:" + value + " DATE:" + date, Toast.LENGTH_LONG, true).show();
-            String names[] = data.getColumnNames();
-
-            for(int i=0; i<names.length; i++){
-                Log.e("Ben", "col_name:" + names[i]);
-                Log.e("Ben", "col_index:" + data.getColumnIndex(names[i]));
-            }
-            Toasty.info(getApplicationContext(), "Column Count:" + data.getColumnCount(), Toast.LENGTH_LONG, true).show();
+            loader.getId();
+            Log.e("Ben", "data getCount:" + data.getCount());
+//            data.moveToFirst();
+//            String name = data.getString(COL_MACRO_NAME);
+//            int value = data.getInt(COL_INTAKE_VALUE);
+//            String date = data.getString(COL_INTAKE_DATE);
+//            textView.setText("Name:" + name + " Value:" + value + " date: " + date);
+            //Toasty.success(getApplicationContext(), "NAME:" + name + " VALUE:" + value + " DATE:" + date, Toast.LENGTH_LONG, true).show();
+//            String names[] = data.getColumnNames();
+//
+//            for(int i=0; i<names.length; i++){
+//                Log.e("Ben", "col_name:" + names[i]);
+//                Log.e("Ben", "col_index:" + data.getColumnIndex(names[i]));
+//            }
+            //Toasty.info(getApplicationContext(), "Column Count:" + data.getColumnCount(), Toast.LENGTH_LONG, true).show();
         }
     }
 
