@@ -1,10 +1,8 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginLeft="16dp"
-    android:layout_marginRight="16dp"
     android:baselineAligned="false"
     android:divider="?android:attr/dividerHorizontal"
     android:orientation="horizontal"
@@ -16,18 +14,130 @@
     master/detail flow.
     
     -->
-
-    <android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
+    <RelativeLayout
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/nutrient_list"
-        android:name="com.example.android.macromonitor.NutrientListFragment"
         android:layout_width="@dimen/item_width"
         android:layout_height="match_parent"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
+        android:name="com.example.android.macromonitor.NutrientListFragment"
         app:layoutManager="LinearLayoutManager"
         tools:context="com.example.android.macromonitor.NutrientListActivity"
-        tools:listitem="@layout/nutrient_list_content" />
+        tools:ignore="MissingPrefix">
+        <View
+            android:id="@+id/horizontalDivider"
+            android:layout_width="2dp"
+            android:layout_height="2dp"
+            android:layout_centerVertical="true"
+            android:background="@color/off_white"/>
+
+        <View
+            android:id="@+id/verticalDivider"
+            android:layout_width="2dp"
+            android:layout_height="2dp"
+            android:layout_centerHorizontal="true"
+            android:background="@color/off_white"/>
+
+        <RelativeLayout
+            android:id="@+id/quadrant_one"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@id/horizontalDivider"
+            android:layout_toLeftOf="@id/verticalDivider"
+            android:layout_toStartOf="@+id/verticalDivider"
+            android:background="@color/red" >
+
+            <TextView
+                android:id="@+id/quadrant_one_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_above="@+id/quadrant_one_button"
+                android:text="LOADING..."
+                android:textAlignment="center"/>
+
+            <Button
+                android:id="@+id/quadrant_one_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="Button"/>
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/quadrant_two"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@id/horizontalDivider"
+            android:layout_toRightOf="@id/verticalDivider"
+            android:layout_toEndOf="@+id/verticalDivider"
+            android:background="@color/white" >
+            <TextView
+                android:id="@+id/quadrant_two_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_above="@+id/quadrant_two_button"
+                android:text="LOADING..."
+                android:textAlignment="center"/>
+
+            <Button
+                android:id="@+id/quadrant_two_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="Button"/>
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/quadrant_three"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/horizontalDivider"
+            android:layout_toLeftOf="@id/verticalDivider"
+            android:layout_toStartOf="@+id/verticalDivider"
+            android:background="@color/blue" >
+            <TextView
+                android:id="@+id/quadrant_three_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_above="@+id/quadrant_three_button"
+                android:text="LOADING..."
+                android:textAlignment="center"/>
+
+            <Button
+                android:id="@+id/quadrant_three_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="Button"/>
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/quadrant_four"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/horizontalDivider"
+            android:layout_toRightOf="@id/verticalDivider"
+            android:layout_toEndOf="@+id/verticalDivider"
+            android:background="@color/green" >
+            <TextView
+                android:id="@+id/quadrant_four_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_above="@+id/quadrant_four_button"
+                android:text="LOADING..."
+                android:textAlignment="center"/>
+
+            <Button
+                android:id="@+id/quadrant_four_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="Button"/>
+        </RelativeLayout>
+    </RelativeLayout>
 
     <FrameLayout
         android:id="@+id/nutrient_detail_container"

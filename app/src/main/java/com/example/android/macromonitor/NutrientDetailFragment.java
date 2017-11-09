@@ -20,7 +20,6 @@ import com.androidplot.xy.StepMode;
 import com.androidplot.xy.XYGraphWidget;
 import com.androidplot.xy.XYPlot;
 import com.androidplot.xy.XYSeries;
-import com.example.android.macromonitor.dummy.DummyContent;
 
 import java.text.DecimalFormat;
 import java.text.FieldPosition;
@@ -45,11 +44,6 @@ public class NutrientDetailFragment extends Fragment {
     public static final String ARG_ITEM_ID = "item_id";
 
     /**
-     * The dummy content this fragment is presenting.
-     */
-    private DummyContent.DummyItem mItem;
-
-    /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
@@ -61,15 +55,15 @@ public class NutrientDetailFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         if (getArguments().containsKey(ARG_ITEM_ID)) {
-            // Load the dummy content specified by the fragment
+            // Load the content specified by the fragment
             // arguments. In a real-world scenario, use a Loader
             // to load content from a content provider.
-            mItem = DummyContent.ITEM_MAP.get(getArguments().getString(ARG_ITEM_ID));
+            //getArguments().getString(ARG_ITEM_ID));
 
             Activity activity = this.getActivity();
             CollapsingToolbarLayout appBarLayout = (CollapsingToolbarLayout) activity.findViewById(R.id.toolbar_layout);
             if (appBarLayout != null) {
-                appBarLayout.setTitle(mItem.content);
+                appBarLayout.setTitle("TITLE");
             }
         }
     }
@@ -133,10 +127,9 @@ public class NutrientDetailFragment extends Fragment {
         //Gives a fixed width to the bars that are drawn
         BarRenderer barRenderer = plot.getRenderer(BarRenderer.class);
         barRenderer.setBarGroupWidth(BarRenderer.BarGroupWidthMode.FIXED_WIDTH, PixelUtils.dpToPix(10));
-        // Show the dummy content as text in a TextView.
-        if (mItem != null) {
-            ((TextView) rootView.findViewById(R.id.nutrient_detail)).setText(mItem.details);
-        }
+        // Show the content as text in a TextView.
+        ((TextView) rootView.findViewById(R.id.nutrient_detail)).setText("DETAILS");
+
 
         return rootView;
     }
