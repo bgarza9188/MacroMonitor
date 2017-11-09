@@ -1,9 +1,30 @@
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/nutrient_detail"
-    style="?android:attr/textAppearanceLarge"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:padding="16dp"
-    android:textIsSelectable="true"
-    tools:context="com.example.android.macromonitor.NutrientDetailFragment" />
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    style="@style/sample_activity"
+    android:orientation="vertical">
+
+    <com.androidplot.xy.XYPlot
+        android:id="@+id/bar_plot"
+        style="@style/APDefacto.Light"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        app:gridClippingEnabled="false"
+        app:gridInsetLeft="35dp"
+        app:gridInsetRight="10dp"
+        app:title="Fat Intake"
+        app:rangeTitle="Intake in Units"
+        app:domainTitle="Day of Week"
+        android:background="@color/ap_gray"/>
+
+    <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/nutrient_detail"
+        style="?android:attr/textAppearanceLarge"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:textIsSelectable="true"
+        tools:context="com.example.android.macromonitor.NutrientDetailFragment"
+        android:background="@color/colorAccent"/>
+</LinearLayout>
