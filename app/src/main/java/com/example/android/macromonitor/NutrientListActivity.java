@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
@@ -26,6 +27,10 @@ import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import es.dmoral.toasty.Toasty;
 
 /**
@@ -36,7 +41,7 @@ import es.dmoral.toasty.Toasty;
  * item details. On tablets, the activity presents the list of items and
  * item details side-by-side using two vertical panes.
  */
-public class NutrientListActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>,MacroConstants {
+public class NutrientListActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>,MacroConstants,UpdateNutrientDialogFragment.NoticeDialogListener {
 
     private final String LOG_TAG = NutrientListActivity.class.getSimpleName();
 
@@ -88,7 +93,7 @@ public class NutrientListActivity extends AppCompatActivity implements LoaderMan
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_nutrient_list);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setTitle(getTitle());
 
@@ -145,7 +150,12 @@ public class NutrientListActivity extends AppCompatActivity implements LoaderMan
         textView_quadrant_four = findViewById(R.id.quadrant_four_text);
         button_quadrant_four = findViewById(R.id.quadrant_four_button);
 
+
+
         //TODO need to call insert to insert new rows for each new day
+        DateFormat df = new SimpleDateFormat("yyyyMMdd");
+        String currentDate = df.format(new Date());
+        Log.e("Date",currentDate);
         //initDBInserts();
         //This will init a loader that will pull all rows
         //getSupportLoaderManager().initLoader(MACRO_LOADER_ONE, null, this);
@@ -168,7 +178,7 @@ public class NutrientListActivity extends AppCompatActivity implements LoaderMan
 
         contentValues.put(MacroContract.MacroEntry.COLUMN_MACRO_NAME, MACRO_WATER_DB_NAME);
         contentValues.put(MacroContract.MacroEntry.COLUMN_INTAKE_VALUE, 0);
-        contentValues.put(MacroContract.MacroEntry.COLUMN_INTAKE_DATE, "20171109");
+        contentValues.put(MacroContract.MacroEntry.COLUMN_INTAKE_DATE, "20171110");
         getContentResolver().insert(MacroContract.MacroEntry.CONTENT_URI,contentValues);
     }
 
@@ -225,17 +235,13 @@ public class NutrientListActivity extends AppCompatActivity implements LoaderMan
             Log.e(LOG_TAG, "Ben data getCount:" + data.getCount());
             data.moveToFirst();
             do{
-                updateUI(loader.getId(), data);
+                updateUI(loader.getId(), data.getString(COL_MACRO_NAME), data.getInt(COL_INTAKE_VALUE));
                 Log.e(LOG_TAG, "Ben macro names:" + data.getString(COL_MACRO_NAME) + " record Date:" + data.getString(COL_INTAKE_DATE) + " record ID:" + data.getInt(COL_MACRO_ENTRY_ID) + " value:" + data.getInt(COL_INTAKE_VALUE));
             }while(data.moveToNext());
-
         }
     }
 
-    private void updateUI(int id, final Cursor data) {
-        data.moveToFirst();//sanity check
-        String name = data.getString(COL_MACRO_NAME);
-        final int value = data.getInt(COL_INTAKE_VALUE);
+    private void updateUI(final int id, String name, final int value) {
         if(id == 1){
             textView_quadrant_one.setText("Name:" + name + ", value:" + value);
             button_quadrant_one.setOnClickListener(new View.OnClickListener() {
@@ -250,9 +256,24 @@ public class NutrientListActivity extends AppCompatActivity implements LoaderMan
 //                    //The 'macro_name' in the where clause should match the quadrant and the update value
 //                    //The date here should also ideally be today's date
 //                    getContentResolver().update(MacroContract.MacroEntry.CONTENT_URI,contentValues, "macro_name = 'WATER' AND intake_date = '20171108'", null);
-                    Intent intent = new Intent(getApplicationContext(), NutrientDetailActivity.class);
-                  //  intent.putExtra(NutrientDetailFragment.ARG_ITEM_ID, 1);
-                    startActivity(intent);
+
+                    UpdateNutrientDialogFragment fragment = new UpdateNutrientDialogFragment();
+                    fragment.show(getSupportFragmentManager(), "Update Alert");
+
+                    //TODO this will be for when the user wants to launch the detail screen
+//                    if (mTwoPane) {
+//                        Bundle arguments = new Bundle();
+//                        arguments.putInt(NutrientDetailFragment.ARG_ITEM_ID, id);
+//                        NutrientDetailFragment fragment = new NutrientDetailFragment();
+//                        fragment.setArguments(arguments);
+//                        getSupportFragmentManager().beginTransaction()
+//                                .replace(R.id.nutrient_detail_container, fragment)
+//                                .commit();
+//                    } else {
+//                        Intent intent = new Intent(getApplicationContext(), NutrientDetailActivity.class);
+//                        intent.putExtra(NutrientDetailFragment.ARG_ITEM_ID, id);
+//                        startActivity(intent);
+//                    }
                 }
             });
         } else if(id == 2) {
@@ -314,6 +335,19 @@ public class NutrientListActivity extends AppCompatActivity implements LoaderMan
     public void onLoaderReset(Loader<Cursor> loader) {
 
     }
+
+    @Override
+    public void onDialogPositiveClick(DialogFragment dialog, int value) {
+        Log.e(LOG_TAG,"ben in onDialogPositiveClick, value is...:" + value);
+
+    }
+
+    @Override
+    public void onDialogNegativeClick(DialogFragment dialog) {
+        Log.e(LOG_TAG,"ben in onDialogNegativeClick");
+    }
+
+
 //    private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
 //        recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(this, DummyContent.ITEMS, mTwoPane));
 //    }

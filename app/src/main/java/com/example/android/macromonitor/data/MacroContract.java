@@ -9,7 +9,7 @@ import android.provider.BaseColumns;
  * Created by jebus on 11/7/2017.
  */
 
-public class MacroContract {
+public final class MacroContract {
     public static final String CONTENT_AUTHORITY = "com.example.android.macromonitor";
 
     // Use CONTENT_AUTHORITY to create the base of all URI's which apps will use to contact
