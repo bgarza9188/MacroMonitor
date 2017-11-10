@@ -54,12 +54,12 @@ public class NutrientListActivity extends AppCompatActivity implements LoaderMan
     private TextView textView_quadrant_two;
     private TextView textView_quadrant_three;
     private TextView textView_quadrant_four;
-    private Button button_quadrant_one;
-    private Button button_quadrant_two;
-    private Button button_quadrant_three;
-    private Button button_quadrant_four;
+    private Button update_button_quadrant_one;
+    private Button update_button_quadrant_two;
+    private Button update_button_quadrant_three;
+    private Button update_button_quadrant_four;
 
-    private static final String[] MACRO_COLUMNS = {
+    public static final String[] MACRO_COLUMNS = {
             MacroContract.MacroEntry.TABLE_NAME + "." + MacroContract.MacroEntry._ID,
             MacroContract.MacroEntry.COLUMN_MACRO_NAME,
             MacroContract.MacroEntry.COLUMN_INTAKE_VALUE,
@@ -97,7 +97,7 @@ public class NutrientListActivity extends AppCompatActivity implements LoaderMan
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setTitle(getTitle());
-        DateFormat df = new SimpleDateFormat("yyyyMMdd");
+        DateFormat df = new SimpleDateFormat(DATE_FORMAT_DB_PATTERN);
         currentDate = df.format(new Date());
         // Configure sign-in to request the user's ID, email address, and basic
         // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
@@ -138,19 +138,16 @@ public class NutrientListActivity extends AppCompatActivity implements LoaderMan
             .build();
         mAdView.loadAd(adRequest);
         textView_quadrant_one = findViewById(R.id.quadrant_one_text);
-        button_quadrant_one = findViewById(R.id.quadrant_one_button);
+        update_button_quadrant_one = findViewById(R.id.quadrant_one_update_button);
 
         textView_quadrant_two = findViewById(R.id.quadrant_two_text);
-        button_quadrant_two = findViewById(R.id.quadrant_two_button);
+        update_button_quadrant_two = findViewById(R.id.quadrant_two_update_button);
 
         textView_quadrant_three = findViewById(R.id.quadrant_three_text);
-        button_quadrant_three = findViewById(R.id.quadrant_three_button);
+        update_button_quadrant_three = findViewById(R.id.quadrant_three_update_button);
 
         textView_quadrant_four = findViewById(R.id.quadrant_four_text);
-        button_quadrant_four = findViewById(R.id.quadrant_four_button);
-
-
-
+        update_button_quadrant_four = findViewById(R.id.quadrant_four_update_button);
 
         Log.e("Date",currentDate);
         //This will init a loader that will pull all rows
@@ -185,6 +182,8 @@ public class NutrientListActivity extends AppCompatActivity implements LoaderMan
         contentValues.put(MacroContract.MacroEntry.COLUMN_INTAKE_DATE, currentDate);
         getContentResolver().insert(MacroContract.MacroEntry.CONTENT_URI,contentValues);
     }
+
+
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -234,7 +233,8 @@ public class NutrientListActivity extends AppCompatActivity implements LoaderMan
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         Log.e(LOG_TAG, "Ben in onLoadFinished, loader ID:" + loader.getId());
         if(data == null || (data != null && data.getCount() == 0)){
-            Log.e(LOG_TAG, "Ben on results from loader");
+            Log.e(LOG_TAG, "Ben on results from loader, adding some!");
+            initDBInserts(loader.getId());
         }else{
             Log.e(LOG_TAG, "Ben data getCount:" + data.getCount());
             data.moveToFirst();
@@ -252,46 +252,51 @@ public class NutrientListActivity extends AppCompatActivity implements LoaderMan
     }
 
     //TODO this will be for when the user wants to launch the detail screen
-//                    if (mTwoPane) {
-//                        Bundle arguments = new Bundle();
-//                        arguments.putInt(NutrientDetailFragment.ARG_ITEM_ID, id);
-//                        NutrientDetailFragment fragment = new NutrientDetailFragment();
-//                        fragment.setArguments(arguments);
-//                        getSupportFragmentManager().beginTransaction()
-//                                .replace(R.id.nutrient_detail_container, fragment)
-//                                .commit();
-//                    } else {
-//                        Intent intent = new Intent(getApplicationContext(), NutrientDetailActivity.class);
-//                        intent.putExtra(NutrientDetailFragment.ARG_ITEM_ID, id);
-//                        startActivity(intent);
-//                    }
+
     private void updateUI(final int loaderId, String name, final int value) {
         switch (loaderId) {
-            case 1: textView_quadrant_one.setText("Name:" + name + ", value:" + value);
-                button_quadrant_one.setOnClickListener(new View.OnClickListener() {
+            case 1: textView_quadrant_one.setText("Name:" + name + " Value:" + value);
+                textView_quadrant_one.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        if (mTwoPane) {
+                            Bundle arguments = new Bundle();
+                            arguments.putInt(NutrientDetailFragment.ARG_MACRO_ID, loaderId);
+                            NutrientDetailFragment fragment = new NutrientDetailFragment();
+                            fragment.setArguments(arguments);
+                            getSupportFragmentManager().beginTransaction()
+                                    .replace(R.id.nutrient_detail_container, fragment)
+                                    .commit();
+                        } else {
+                            Intent intent = new Intent(getApplicationContext(), NutrientDetailActivity.class);
+                            intent.putExtra(NutrientDetailFragment.ARG_MACRO_ID, loaderId);
+                            startActivity(intent);
+                        }
+                    }});
+                update_button_quadrant_one.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         UpdateNutrientDialogFragment.newInstance(loaderId).show(getSupportFragmentManager(), "Update Alert");
                     }});
                 break;
-            case 2: textView_quadrant_two.setText("Name:" + name + ", value:" + value);
-                button_quadrant_two.setOnClickListener(new View.OnClickListener() {
+            case 2: textView_quadrant_two.setText("Name:" + name + " Value:" + value);
+                update_button_quadrant_two.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         UpdateNutrientDialogFragment.newInstance(loaderId).show(getSupportFragmentManager(), "Update Alert");
                     }
                 });
                 break;
-            case 3: textView_quadrant_three.setText("Name:" + name + ", value:" + value);
-                button_quadrant_three.setOnClickListener(new View.OnClickListener() {
+            case 3: textView_quadrant_three.setText("Name:" + name + " Value:" + value);
+                update_button_quadrant_three.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         UpdateNutrientDialogFragment.newInstance(loaderId).show(getSupportFragmentManager(), "Update Alert");
                     }
                 });
                 break;
-            case 4: textView_quadrant_four.setText("Name:" + name + ", value:" + value);
-                button_quadrant_four.setOnClickListener(new View.OnClickListener() {
+            case 4: textView_quadrant_four.setText("Name:" + name + " Value:" + value);
+                update_button_quadrant_four.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         UpdateNutrientDialogFragment.newInstance(loaderId).show(getSupportFragmentManager(), "Update Alert");
@@ -361,7 +366,7 @@ public class NutrientListActivity extends AppCompatActivity implements LoaderMan
 //                DummyContent.DummyItem item = (DummyContent.DummyItem) view.getTag();
 //                if (mTwoPane) {
 //                    Bundle arguments = new Bundle();
-//                    arguments.putString(NutrientDetailFragment.ARG_ITEM_ID, item.id);
+//                    arguments.putString(NutrientDetailFragment.ARG_MACRO_ID, item.id);
 //                    NutrientDetailFragment fragment = new NutrientDetailFragment();
 //                    fragment.setArguments(arguments);
 //                    mParentActivity.getSupportFragmentManager().beginTransaction()
@@ -370,7 +375,7 @@ public class NutrientListActivity extends AppCompatActivity implements LoaderMan
 //                } else {
 //                    Context context = view.getContext();
 //                    Intent intent = new Intent(context, NutrientDetailActivity.class);
-//                    intent.putExtra(NutrientDetailFragment.ARG_ITEM_ID, item.id);
+//                    intent.putExtra(NutrientDetailFragment.ARG_MACRO_ID, item.id);
 //
 //                    context.startActivity(intent);
 //                }

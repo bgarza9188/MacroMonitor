@@ -54,8 +54,8 @@ public class NutrientDetailActivity extends AppCompatActivity {
             // Create the detail fragment and add it to the activity
             // using a fragment transaction.
             Bundle arguments = new Bundle();
-            arguments.putString(NutrientDetailFragment.ARG_ITEM_ID,
-                    getIntent().getStringExtra(NutrientDetailFragment.ARG_ITEM_ID));
+            arguments.putInt(NutrientDetailFragment.ARG_MACRO_ID,
+                    getIntent().getIntExtra(NutrientDetailFragment.ARG_MACRO_ID,0));
             NutrientDetailFragment fragment = new NutrientDetailFragment();
             fragment.setArguments(arguments);
             getSupportFragmentManager().beginTransaction()

@@ -15,4 +15,6 @@ public interface MacroConstants {
     String LOADER_ARG_CLOSE_QUOTE = "'";
     String LOADER_ARG_BUNDLE_KEY_SELECTION = "SELECTION";
     String SORT_ORDER_LATEST_RECORD = MacroContract.MacroEntry.COLUMN_INTAKE_DATE + " DESC LIMIT 1";
+    String SORT_ORDER_LATEST_SEVEN_RECORDS = MacroContract.MacroEntry.COLUMN_INTAKE_DATE + " DESC LIMIT 7";
+    String DATE_FORMAT_DB_PATTERN = "yyyyMMdd";
 }

@@ -44,6 +44,8 @@ public class UpdateNutrientDialogFragment extends DialogFragment {
         // Use the Builder class for convenient dialog construction
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         // Get the layout inflater
+        // Inflate and set the layout for the dialog
+        // Pass null as the parent view because its going in the dialog layout
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View rootView = inflater.inflate(R.layout.fragment_update_nutrient_dialog, null);
 
@@ -59,11 +61,9 @@ public class UpdateNutrientDialogFragment extends DialogFragment {
 
         builder.setTitle("Update Nutrient Intake");
 
-        // Inflate and set the layout for the dialog
-        // Pass null as the parent view because its going in the dialog layout
-        builder.setView(rootView);
+        builder.setMessage("Select a number:");
 
-        builder.setMessage("Select a number:")
+        builder.setView(rootView)
                 .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         Toasty.info(getActivity(), "User OK value:" + numberPicker.getValue()).show();
@@ -109,8 +109,8 @@ public class UpdateNutrientDialogFragment extends DialogFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_update_nutrient_dialog, container, false);
+        // Returning null here since the layout gets inflated with the Alert Dialog
+        return null;
     }
 
     @Override

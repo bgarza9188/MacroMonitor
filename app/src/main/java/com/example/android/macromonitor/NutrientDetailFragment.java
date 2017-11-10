@@ -1,11 +1,13 @@
 package com.example.android.macromonitor;
 
 import android.app.Activity;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,12 +22,18 @@ import com.androidplot.xy.StepMode;
 import com.androidplot.xy.XYGraphWidget;
 import com.androidplot.xy.XYPlot;
 import com.androidplot.xy.XYSeries;
+import com.example.android.macromonitor.data.MacroContract;
 
 import java.text.DecimalFormat;
 import java.text.FieldPosition;
 import java.text.Format;
 import java.text.ParsePosition;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+
+import static com.example.android.macromonitor.NutrientListActivity.COL_INTAKE_DATE;
+import static com.example.android.macromonitor.NutrientListActivity.COL_INTAKE_VALUE;
 
 /**
  * A fragment representing a single Nutrient detail screen.
@@ -33,7 +41,7 @@ import java.util.Arrays;
  * in two-pane mode (on tablets) or a {@link NutrientDetailActivity}
  * on handsets.
  */
-public class NutrientDetailFragment extends Fragment {
+public class NutrientDetailFragment extends Fragment  implements MacroConstants{
 
     private XYPlot plot;
 
@@ -41,7 +49,7 @@ public class NutrientDetailFragment extends Fragment {
      * The fragment argument representing the item ID that this fragment
      * represents.
      */
-    public static final String ARG_ITEM_ID = "item_id";
+    public static final String ARG_MACRO_ID = "macro_id";
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -54,11 +62,11 @@ public class NutrientDetailFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (getArguments().containsKey(ARG_ITEM_ID)) {
+        if (getArguments().containsKey(ARG_MACRO_ID)) {
             // Load the content specified by the fragment
             // arguments. In a real-world scenario, use a Loader
             // to load content from a content provider.
-            //getArguments().getString(ARG_ITEM_ID));
+            //getArguments().getString(ARG_MACRO_ID));
 
             Activity activity = this.getActivity();
             CollapsingToolbarLayout appBarLayout = (CollapsingToolbarLayout) activity.findViewById(R.id.toolbar_layout);
@@ -77,6 +85,27 @@ public class NutrientDetailFragment extends Fragment {
         // create a bar formatter with a red fill color and a black outline:
         BarFormatter bf = new BarFormatter(Color.RED, Color.BLACK);
         XYSeries series;
+        Cursor cursor = getActivity().getContentResolver().query(MacroContract.MacroEntry.CONTENT_URI,
+                NutrientListActivity.MACRO_COLUMNS,
+                LOADER_DB_NAME_ARG + MACRO_WATER_DB_NAME + LOADER_ARG_CLOSE_QUOTE,
+                null,
+                SORT_ORDER_LATEST_SEVEN_RECORDS);
+        if(cursor != null) {
+            Log.e("ben", "cursor not null!");
+            cursor.moveToFirst();
+            do{
+                Log.e("ben", " cursor date:" + cursor.getString(COL_INTAKE_DATE) + " cursor Value:" + cursor.getInt(COL_INTAKE_VALUE));
+            }while(cursor.moveToNext());
+        } else {
+            Log.e("ben","cursor was null :/");
+        }
+
+        Calendar calender = Calendar.getInstance();
+        calender.add(Calendar.DATE,-7);
+        Date date = calender.getTime();
+        Log.e("ben","Current WEEK OF YEAR:" + calender.get(Calendar.WEEK_OF_YEAR));
+        Log.e("ben", "Current DAY OF WEEK:" + calender.get(Calendar.DAY_OF_WEEK));
+        Log.e("ben", "Current Day plus one:" + date.toString());
         Number[] intakeValues = {2, 4, 25, 20, 17, 4, 9};
         plot.getGraph().getLineLabelStyle(XYGraphWidget.Edge.BOTTOM).setFormat(new Format() {
             @Override
@@ -86,19 +115,19 @@ public class NutrientDetailFragment extends Fragment {
                 int i = Math.round(((Number) obj).floatValue());
                 String dayOfWeek;
                 switch (i){
-                    case 0: dayOfWeek = "Monday";
+                    case 0: dayOfWeek = "Sun.";
                         break;
-                    case 1: dayOfWeek = "Tuesday";
+                    case 1: dayOfWeek = "Mon.";
                         break;
-                    case 2: dayOfWeek = "Wednesday";
+                    case 2: dayOfWeek = "Tue.";
                         break;
-                    case 3: dayOfWeek = "Thursday";
+                    case 3: dayOfWeek = "Wed.";
                         break;
-                    case 4: dayOfWeek = "Friday";
+                    case 4: dayOfWeek = "Thu.";
                         break;
-                    case 5: dayOfWeek = "Saturday";
+                    case 5: dayOfWeek = "Fri.";
                         break;
-                    case 6: dayOfWeek = "Sunday";
+                    case 6: dayOfWeek = "Sat.";
                         break;
                     default: dayOfWeek = "Day";
                         break;
