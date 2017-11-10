@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,8 +31,7 @@ public class UpdateNutrientDialogFragment extends DialogFragment {
     private static final String ARG_PARAM2 = "param2";
 
     // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private int loaderId;
 
     private NoticeDialogListener mListener;
 
@@ -67,7 +67,7 @@ public class UpdateNutrientDialogFragment extends DialogFragment {
                 .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         Toasty.info(getActivity(), "User OK value:" + numberPicker.getValue()).show();
-                        mListener.onDialogPositiveClick(UpdateNutrientDialogFragment.this, numberPicker.getValue());
+                        mListener.onDialogPositiveClick(UpdateNutrientDialogFragment.this, numberPicker.getValue(), loaderId);
                     }
                 })
                 .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
@@ -85,16 +85,14 @@ public class UpdateNutrientDialogFragment extends DialogFragment {
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
+     * @param loaderId Parameter 1.
      * @return A new instance of fragment UpdateNutrientDialogFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static UpdateNutrientDialogFragment newInstance(String param1, String param2) {
+    public static UpdateNutrientDialogFragment newInstance(int loaderId) {
         UpdateNutrientDialogFragment fragment = new UpdateNutrientDialogFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+        args.putInt(ARG_PARAM1, loaderId);
         fragment.setArguments(args);
         return fragment;
     }
@@ -103,8 +101,8 @@ public class UpdateNutrientDialogFragment extends DialogFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            loaderId = getArguments().getInt(ARG_PARAM1);
+            Log.e("diag. args","ben, loaderId:" + loaderId);
         }
     }
 
@@ -143,7 +141,7 @@ public class UpdateNutrientDialogFragment extends DialogFragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface NoticeDialogListener  {
-        public void onDialogPositiveClick(DialogFragment dialog, int value);
+        public void onDialogPositiveClick(DialogFragment dialog, int value, int loaderId);
         public void onDialogNegativeClick(DialogFragment dialog);
     }
 }

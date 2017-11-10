@@ -71,6 +71,7 @@ public class NutrientListActivity extends AppCompatActivity implements LoaderMan
     public static final int COL_INTAKE_VALUE = 2;
     public static final int COL_INTAKE_DATE = 3;
     private static final String TAG = NutrientListActivity.class.getSimpleName();
+    private String currentDate;
     /**
      * Whether or not the activity is in two-pane mode, i.e. running on a tablet
      * device.
@@ -96,7 +97,8 @@ public class NutrientListActivity extends AppCompatActivity implements LoaderMan
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setTitle(getTitle());
-
+        DateFormat df = new SimpleDateFormat("yyyyMMdd");
+        currentDate = df.format(new Date());
         // Configure sign-in to request the user's ID, email address, and basic
         // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -129,9 +131,6 @@ public class NutrientListActivity extends AppCompatActivity implements LoaderMan
             mTwoPane = true;
         }
 
-//        View recyclerView = findViewById(R.id.nutrient_list);
-//        assert recyclerView != null;
-//        setupRecyclerView((RecyclerView) recyclerView);
         MobileAds.initialize(this, "ca-app-pub-3940256099942544~3347511713");
         mAdView = (AdView) findViewById(R.id.adView);
         AdRequest adRequest = new AdRequest.Builder()
@@ -152,11 +151,8 @@ public class NutrientListActivity extends AppCompatActivity implements LoaderMan
 
 
 
-        //TODO need to call insert to insert new rows for each new day
-        DateFormat df = new SimpleDateFormat("yyyyMMdd");
-        String currentDate = df.format(new Date());
+
         Log.e("Date",currentDate);
-        //initDBInserts();
         //This will init a loader that will pull all rows
         //getSupportLoaderManager().initLoader(MACRO_LOADER_ONE, null, this);
         Bundle bundle = new Bundle();
@@ -173,12 +169,20 @@ public class NutrientListActivity extends AppCompatActivity implements LoaderMan
         getSupportLoaderManager().initLoader(MACRO_LOADER_FOUR, bundle, this);
     }
 
-    private void initDBInserts() {
+    private void initDBInserts(int loaderId) {
         ContentValues contentValues = new ContentValues();
-
-        contentValues.put(MacroContract.MacroEntry.COLUMN_MACRO_NAME, MACRO_WATER_DB_NAME);
+        switch (loaderId) {
+            case 1: contentValues.put(MacroContract.MacroEntry.COLUMN_MACRO_NAME, MACRO_WATER_DB_NAME);
+                break;
+            case 2: contentValues.put(MacroContract.MacroEntry.COLUMN_MACRO_NAME, MACRO_FAT_DB_NAME);
+                break;
+            case 3: contentValues.put(MacroContract.MacroEntry.COLUMN_MACRO_NAME, MACRO_CARB_DB_NAME);
+                break;
+            case 4: contentValues.put(MacroContract.MacroEntry.COLUMN_MACRO_NAME, MACRO_SUGAR_DB_NAME);
+                break;
+        }
         contentValues.put(MacroContract.MacroEntry.COLUMN_INTAKE_VALUE, 0);
-        contentValues.put(MacroContract.MacroEntry.COLUMN_INTAKE_DATE, "20171110");
+        contentValues.put(MacroContract.MacroEntry.COLUMN_INTAKE_DATE, currentDate);
         getContentResolver().insert(MacroContract.MacroEntry.CONTENT_URI,contentValues);
     }
 
@@ -214,6 +218,7 @@ public class NutrientListActivity extends AppCompatActivity implements LoaderMan
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
         startActivityForResult(signInIntent, RC_SIGN_IN);
     }
+
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         CursorLoader loader = new CursorLoader(this,
@@ -222,7 +227,6 @@ public class NutrientListActivity extends AppCompatActivity implements LoaderMan
                 args.getString(LOADER_ARG_BUNDLE_KEY_SELECTION),
                 null,
                 SORT_ORDER_LATEST_RECORD);
-
         return loader;
     }
 
@@ -235,32 +239,19 @@ public class NutrientListActivity extends AppCompatActivity implements LoaderMan
             Log.e(LOG_TAG, "Ben data getCount:" + data.getCount());
             data.moveToFirst();
             do{
+                if(!data.getString(COL_INTAKE_DATE).equalsIgnoreCase(currentDate)){
+                    Log.e("Ben","old record was found :(");
+                    //Need to Insert a new record for today
+                    initDBInserts(loader.getId());
+                    continue;
+                }
                 updateUI(loader.getId(), data.getString(COL_MACRO_NAME), data.getInt(COL_INTAKE_VALUE));
                 Log.e(LOG_TAG, "Ben macro names:" + data.getString(COL_MACRO_NAME) + " record Date:" + data.getString(COL_INTAKE_DATE) + " record ID:" + data.getInt(COL_MACRO_ENTRY_ID) + " value:" + data.getInt(COL_INTAKE_VALUE));
             }while(data.moveToNext());
         }
     }
 
-    private void updateUI(final int id, String name, final int value) {
-        if(id == 1){
-            textView_quadrant_one.setText("Name:" + name + ", value:" + value);
-            button_quadrant_one.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-//                    //Make an update call to DB
-//                    ContentValues contentValues = new ContentValues();
-//                    contentValues.put(MacroContract.MacroEntry.COLUMN_MACRO_NAME, MACRO_WATER_DB_NAME);
-//                    contentValues.put(MacroContract.MacroEntry.COLUMN_INTAKE_VALUE, value+1);
-//                    //Ideally the date set here will be today's date
-//                    contentValues.put(MacroContract.MacroEntry.COLUMN_INTAKE_DATE, "20171108");
-//                    //The 'macro_name' in the where clause should match the quadrant and the update value
-//                    //The date here should also ideally be today's date
-//                    getContentResolver().update(MacroContract.MacroEntry.CONTENT_URI,contentValues, "macro_name = 'WATER' AND intake_date = '20171108'", null);
-
-                    UpdateNutrientDialogFragment fragment = new UpdateNutrientDialogFragment();
-                    fragment.show(getSupportFragmentManager(), "Update Alert");
-
-                    //TODO this will be for when the user wants to launch the detail screen
+    //TODO this will be for when the user wants to launch the detail screen
 //                    if (mTwoPane) {
 //                        Bundle arguments = new Bundle();
 //                        arguments.putInt(NutrientDetailFragment.ARG_ITEM_ID, id);
@@ -274,59 +265,39 @@ public class NutrientListActivity extends AppCompatActivity implements LoaderMan
 //                        intent.putExtra(NutrientDetailFragment.ARG_ITEM_ID, id);
 //                        startActivity(intent);
 //                    }
-                }
-            });
-        } else if(id == 2) {
-            textView_quadrant_two.setText("Name:" + name + ", value:" + value);
-            button_quadrant_two.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    //Make an update call to DB
-                    ContentValues contentValues = new ContentValues();
-                    contentValues.put(MacroContract.MacroEntry.COLUMN_MACRO_NAME, MACRO_FAT_DB_NAME);
-                    //just doing '+1' for now
-                    contentValues.put(MacroContract.MacroEntry.COLUMN_INTAKE_VALUE, value+1);
-                    //Ideally the date set here will be today's date
-                    contentValues.put(MacroContract.MacroEntry.COLUMN_INTAKE_DATE, "20171108");
-                    //The 'macro_name' in the where clause should match the quadrant and the update value
-                    //The date here should also ideally be today's date
-                    getContentResolver().update(MacroContract.MacroEntry.CONTENT_URI,contentValues, "macro_name = 'FAT' AND intake_date = '20171108'", null);
-                }
-            });
-        } else if(id == 3) {
-            textView_quadrant_three.setText("Name:" + name + ", value:" + value);
-            button_quadrant_three.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    //Make an update call to DB
-                    ContentValues contentValues = new ContentValues();
-                    contentValues.put(MacroContract.MacroEntry.COLUMN_MACRO_NAME, MACRO_CARB_DB_NAME);
-                    //just doing '+1' for now
-                    contentValues.put(MacroContract.MacroEntry.COLUMN_INTAKE_VALUE, value+1);
-                    //Ideally the date set here will be today's date
-                    contentValues.put(MacroContract.MacroEntry.COLUMN_INTAKE_DATE, "20171108");
-                    //The 'macro_name' in the where clause should match the quadrant and the update value
-                    //The date here should also ideally be today's date
-                    getContentResolver().update(MacroContract.MacroEntry.CONTENT_URI,contentValues, "macro_name = 'CARBOHYDRATES' AND intake_date = '20171108'", null);
-                }
-            });
-        } else if(id == 4) {
-            textView_quadrant_four.setText("Name:" + name + ", value:" + value);
-            button_quadrant_four.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    //Make an update call to DB
-                    ContentValues contentValues = new ContentValues();
-                    contentValues.put(MacroContract.MacroEntry.COLUMN_MACRO_NAME, MACRO_SUGAR_DB_NAME);
-                    //just doing '+1' for now
-                    contentValues.put(MacroContract.MacroEntry.COLUMN_INTAKE_VALUE, value+1);
-                    //Ideally the date set here will be today's date
-                    contentValues.put(MacroContract.MacroEntry.COLUMN_INTAKE_DATE, "20171108");
-                    //The 'macro_name' in the where clause should match the quadrant and the update value
-                    //The date here should also ideally be today's date
-                    getContentResolver().update(MacroContract.MacroEntry.CONTENT_URI,contentValues, "macro_name = 'SUGAR' AND intake_date = '20171108'", null);
-                }
-            });
+    private void updateUI(final int loaderId, String name, final int value) {
+        switch (loaderId) {
+            case 1: textView_quadrant_one.setText("Name:" + name + ", value:" + value);
+                button_quadrant_one.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        UpdateNutrientDialogFragment.newInstance(loaderId).show(getSupportFragmentManager(), "Update Alert");
+                    }});
+                break;
+            case 2: textView_quadrant_two.setText("Name:" + name + ", value:" + value);
+                button_quadrant_two.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        UpdateNutrientDialogFragment.newInstance(loaderId).show(getSupportFragmentManager(), "Update Alert");
+                    }
+                });
+                break;
+            case 3: textView_quadrant_three.setText("Name:" + name + ", value:" + value);
+                button_quadrant_three.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        UpdateNutrientDialogFragment.newInstance(loaderId).show(getSupportFragmentManager(), "Update Alert");
+                    }
+                });
+                break;
+            case 4: textView_quadrant_four.setText("Name:" + name + ", value:" + value);
+                button_quadrant_four.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        UpdateNutrientDialogFragment.newInstance(loaderId).show(getSupportFragmentManager(), "Update Alert");
+                    }
+                });
+                break;
         }
 
     }
@@ -337,9 +308,9 @@ public class NutrientListActivity extends AppCompatActivity implements LoaderMan
     }
 
     @Override
-    public void onDialogPositiveClick(DialogFragment dialog, int value) {
-        Log.e(LOG_TAG,"ben in onDialogPositiveClick, value is...:" + value);
-
+    public void onDialogPositiveClick(DialogFragment dialog, int value, int loaderId) {
+        Log.e(LOG_TAG,"ben in onDialogPositiveClick, value is...:" + value + ", loaderId:" + loaderId);
+        updateDBIntakeValue(loaderId, value);
     }
 
     @Override
@@ -347,6 +318,32 @@ public class NutrientListActivity extends AppCompatActivity implements LoaderMan
         Log.e(LOG_TAG,"ben in onDialogNegativeClick");
     }
 
+    private void updateDBIntakeValue(int loaderId, int value){
+        //Make an update call to DB
+        ContentValues contentValues = new ContentValues();
+        String whereClauseNameCondition = "";
+        switch (loaderId) {
+            case 1: contentValues.put(MacroContract.MacroEntry.COLUMN_MACRO_NAME, MACRO_WATER_DB_NAME);
+                whereClauseNameCondition = LOADER_DB_NAME_ARG + MACRO_WATER_DB_NAME + LOADER_ARG_CLOSE_QUOTE;
+                break;
+            case 2: contentValues.put(MacroContract.MacroEntry.COLUMN_MACRO_NAME, MACRO_FAT_DB_NAME);
+                whereClauseNameCondition = LOADER_DB_NAME_ARG + MACRO_FAT_DB_NAME + LOADER_ARG_CLOSE_QUOTE;
+                break;
+            case 3: contentValues.put(MacroContract.MacroEntry.COLUMN_MACRO_NAME, MACRO_CARB_DB_NAME);
+                whereClauseNameCondition = LOADER_DB_NAME_ARG + MACRO_CARB_DB_NAME + LOADER_ARG_CLOSE_QUOTE;
+                break;
+            case 4: contentValues.put(MacroContract.MacroEntry.COLUMN_MACRO_NAME, MACRO_SUGAR_DB_NAME);
+                whereClauseNameCondition = LOADER_DB_NAME_ARG + MACRO_SUGAR_DB_NAME + LOADER_ARG_CLOSE_QUOTE;
+                break;
+        }
+
+        contentValues.put(MacroContract.MacroEntry.COLUMN_INTAKE_VALUE, value);
+        //Ideally the date set here will be today's date
+        contentValues.put(MacroContract.MacroEntry.COLUMN_INTAKE_DATE, currentDate);
+        //The 'macro_name' in the where clause should match the quadrant and the update value
+        //The date here should also ideally be today's date
+        getContentResolver().update(MacroContract.MacroEntry.CONTENT_URI,contentValues, whereClauseNameCondition + " AND intake_date = '" + currentDate + LOADER_ARG_CLOSE_QUOTE, null);
+    }
 
 //    private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
 //        recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(this, DummyContent.ITEMS, mTwoPane));
