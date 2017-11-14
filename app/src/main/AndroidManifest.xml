@@ -44,8 +44,18 @@
             android:theme="@android:style/Theme.Translucent" />
 
         <provider
-            android:authorities="com.example.android.macromonitor"
-            android:name=".data.MacroProvider" />
+            android:name=".data.MacroProvider"
+            android:authorities="com.example.android.macromonitor" />
+
+        <receiver android:name=".MacroWidget">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/macro_widget_info" />
+        </receiver>
     </application>
 
 </manifest>

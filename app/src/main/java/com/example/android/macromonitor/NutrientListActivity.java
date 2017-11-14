@@ -3,6 +3,7 @@ package com.example.android.macromonitor;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.LoaderManager;
@@ -11,6 +12,9 @@ import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -87,6 +91,39 @@ public class NutrientListActivity extends AppCompatActivity implements LoaderMan
         if(account != null){
             Toasty.info(this, "User is signed in !").show();
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        Log.i(LOG_TAG, "ben, onCreateOptionsMenu");
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        if(getFragmentManager().findFragmentByTag("settings") != null){
+            Log.e(LOG_TAG,"Ben trying to remove fragment");
+            getFragmentManager().beginTransaction().remove(getFragmentManager().findFragmentByTag("settings")).commit();
+            return true;
+        }
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            getFragmentManager().beginTransaction()
+                    .replace(R.id.frameLayout, new SettingsFragment(), "settings")
+                    .commit();
+            Log.e(LOG_TAG,"ben, settings was clicked");
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

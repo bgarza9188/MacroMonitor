@@ -8,4 +8,10 @@
     <string name="cancel">Cancel</string>
     <string name="update_button">Update</string>
     <string name="loading">Loading...</string>
+    <string name="appwidget_text">Widget Text</string>
+    <string name="add_widget">Add widget</string>
+    <string name="weight">Weight</string>
+    <string name="goals_preference_title">Nutrition Goals</string>
+    <string name="goals">Goals</string>
+    <string name="settings">Settings</string>
 </resources>
