@@ -1,10 +1,14 @@
 package com.example.android.macromonitor;
 
+import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -13,10 +17,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.RemoteViews;
 import android.widget.TextView;
 
 import com.example.android.macromonitor.data.MacroContract;
@@ -34,6 +38,7 @@ import com.google.android.gms.tasks.Task;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Set;
 
 import es.dmoral.toasty.Toasty;
 
@@ -50,10 +55,7 @@ public class NutrientListActivity extends AppCompatActivity implements LoaderMan
     private final String LOG_TAG = NutrientListActivity.class.getSimpleName();
 
     private static final int RC_SIGN_IN = 86;
-    private static final int MACRO_LOADER_ONE = 1;
-    private static final int MACRO_LOADER_TWO = 2;
-    private static final int MACRO_LOADER_THREE = 3;
-    private static final int MACRO_LOADER_FOUR = 4;
+    private String[] macro_pref_array = new String[4];
     private TextView textView_quadrant_one;
     private TextView textView_quadrant_two;
     private TextView textView_quadrant_three;
@@ -108,17 +110,10 @@ public class NutrientListActivity extends AppCompatActivity implements LoaderMan
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        if(getFragmentManager().findFragmentByTag("settings") != null){
-            Log.e(LOG_TAG,"Ben trying to remove fragment");
-            getFragmentManager().beginTransaction().remove(getFragmentManager().findFragmentByTag("settings")).commit();
-            return true;
-        }
-
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            getFragmentManager().beginTransaction()
-                    .replace(R.id.frameLayout, new SettingsFragment(), "settings")
-                    .commit();
+            Intent intent = new Intent(getApplicationContext(), SettingsActivity.class);
+            startActivity(intent);
             Log.e(LOG_TAG,"ben, settings was clicked");
             return true;
         }
@@ -134,6 +129,7 @@ public class NutrientListActivity extends AppCompatActivity implements LoaderMan
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setTitle(getTitle());
+        PreferenceManager.setDefaultValues(this, R.xml.pref_general, false);
         DateFormat df = new SimpleDateFormat(DATE_FORMAT_DB_PATTERN);
         currentDate = df.format(new Date());
         // Configure sign-in to request the user's ID, email address, and basic
@@ -190,29 +186,28 @@ public class NutrientListActivity extends AppCompatActivity implements LoaderMan
         //This will init a loader that will pull all rows
         //getSupportLoaderManager().initLoader(MACRO_LOADER_ONE, null, this);
         Bundle bundle = new Bundle();
-        bundle.putString(LOADER_ARG_BUNDLE_KEY_SELECTION, LOADER_DB_NAME_ARG + MACRO_WATER_DB_NAME + LOADER_ARG_CLOSE_QUOTE);
-        getSupportLoaderManager().initLoader(MACRO_LOADER_ONE, bundle, this);
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        Set<String> selections = sharedPref.getStringSet("macro_pref_list",null);
+        Log.e(LOG_TAG,"ben selections size:" + selections.size());
 
-        bundle.putString(LOADER_ARG_BUNDLE_KEY_SELECTION, LOADER_DB_NAME_ARG + MACRO_FAT_DB_NAME + LOADER_ARG_CLOSE_QUOTE);
-        getSupportLoaderManager().initLoader(MACRO_LOADER_TWO, bundle, this);
-
-        bundle.putString(LOADER_ARG_BUNDLE_KEY_SELECTION, LOADER_DB_NAME_ARG + MACRO_CARB_DB_NAME + LOADER_ARG_CLOSE_QUOTE);
-        getSupportLoaderManager().initLoader(MACRO_LOADER_THREE, bundle, this);
-
-        bundle.putString(LOADER_ARG_BUNDLE_KEY_SELECTION, LOADER_DB_NAME_ARG + MACRO_SUGAR_DB_NAME + LOADER_ARG_CLOSE_QUOTE);
-        getSupportLoaderManager().initLoader(MACRO_LOADER_FOUR, bundle, this);
+        macro_pref_array = selections.toArray(macro_pref_array);
+        for(int loaderId = 0; loaderId < 4; loaderId++) {
+            Log.e(LOG_TAG,"macro_pref_array value:" + macro_pref_array[loaderId] + " at loader:" + loaderId);
+        //    bundle.putString(LOADER_ARG_BUNDLE_KEY_SELECTION, LOADER_DB_NAME_ARG +  + LOADER_ARG_CLOSE_QUOTE);
+       //     getSupportLoaderManager().initLoader(loaderId, bundle, this);
+        }
     }
 
     private void initDBInserts(int loaderId) {
         ContentValues contentValues = new ContentValues();
         switch (loaderId) {
-            case 1: contentValues.put(MacroContract.MacroEntry.COLUMN_MACRO_NAME, MACRO_WATER_DB_NAME);
+            case 0: contentValues.put(MacroContract.MacroEntry.COLUMN_MACRO_NAME, MACRO_WATER_DB_NAME);
                 break;
-            case 2: contentValues.put(MacroContract.MacroEntry.COLUMN_MACRO_NAME, MACRO_FAT_DB_NAME);
+            case 1: contentValues.put(MacroContract.MacroEntry.COLUMN_MACRO_NAME, MACRO_FAT_DB_NAME);
                 break;
-            case 3: contentValues.put(MacroContract.MacroEntry.COLUMN_MACRO_NAME, MACRO_CARB_DB_NAME);
+            case 2: contentValues.put(MacroContract.MacroEntry.COLUMN_MACRO_NAME, MACRO_CARB_DB_NAME);
                 break;
-            case 4: contentValues.put(MacroContract.MacroEntry.COLUMN_MACRO_NAME, MACRO_SUGAR_DB_NAME);
+            case 3: contentValues.put(MacroContract.MacroEntry.COLUMN_MACRO_NAME, MACRO_SUGAR_DB_NAME);
                 break;
         }
         contentValues.put(MacroContract.MacroEntry.COLUMN_INTAKE_VALUE, 0);
@@ -292,7 +287,7 @@ public class NutrientListActivity extends AppCompatActivity implements LoaderMan
 
     private void updateUI(final int loaderId, String name, final int value) {
         switch (loaderId) {
-            case 1: textView_quadrant_one.setText("Name:" + name + " Value:" + value);
+            case 0: textView_quadrant_one.setText("Name:" + name + " Value:" + value);
                 textView_quadrant_one.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -316,7 +311,7 @@ public class NutrientListActivity extends AppCompatActivity implements LoaderMan
                         UpdateNutrientDialogFragment.newInstance(loaderId).show(getSupportFragmentManager(), "Update Alert");
                     }});
                 break;
-            case 2: textView_quadrant_two.setText("Name:" + name + " Value:" + value);
+            case 1: textView_quadrant_two.setText("Name:" + name + " Value:" + value);
                 update_button_quadrant_two.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -324,7 +319,7 @@ public class NutrientListActivity extends AppCompatActivity implements LoaderMan
                     }
                 });
                 break;
-            case 3: textView_quadrant_three.setText("Name:" + name + " Value:" + value);
+            case 2: textView_quadrant_three.setText("Name:" + name + " Value:" + value);
                 update_button_quadrant_three.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -332,7 +327,7 @@ public class NutrientListActivity extends AppCompatActivity implements LoaderMan
                     }
                 });
                 break;
-            case 4: textView_quadrant_four.setText("Name:" + name + " Value:" + value);
+            case 3: textView_quadrant_four.setText("Name:" + name + " Value:" + value);
                 update_button_quadrant_four.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -365,16 +360,16 @@ public class NutrientListActivity extends AppCompatActivity implements LoaderMan
         ContentValues contentValues = new ContentValues();
         String whereClauseNameCondition = "";
         switch (loaderId) {
-            case 1: contentValues.put(MacroContract.MacroEntry.COLUMN_MACRO_NAME, MACRO_WATER_DB_NAME);
+            case 0: contentValues.put(MacroContract.MacroEntry.COLUMN_MACRO_NAME, MACRO_WATER_DB_NAME);
                 whereClauseNameCondition = LOADER_DB_NAME_ARG + MACRO_WATER_DB_NAME + LOADER_ARG_CLOSE_QUOTE;
                 break;
-            case 2: contentValues.put(MacroContract.MacroEntry.COLUMN_MACRO_NAME, MACRO_FAT_DB_NAME);
+            case 1: contentValues.put(MacroContract.MacroEntry.COLUMN_MACRO_NAME, MACRO_FAT_DB_NAME);
                 whereClauseNameCondition = LOADER_DB_NAME_ARG + MACRO_FAT_DB_NAME + LOADER_ARG_CLOSE_QUOTE;
                 break;
-            case 3: contentValues.put(MacroContract.MacroEntry.COLUMN_MACRO_NAME, MACRO_CARB_DB_NAME);
+            case 2: contentValues.put(MacroContract.MacroEntry.COLUMN_MACRO_NAME, MACRO_CARB_DB_NAME);
                 whereClauseNameCondition = LOADER_DB_NAME_ARG + MACRO_CARB_DB_NAME + LOADER_ARG_CLOSE_QUOTE;
                 break;
-            case 4: contentValues.put(MacroContract.MacroEntry.COLUMN_MACRO_NAME, MACRO_SUGAR_DB_NAME);
+            case 3: contentValues.put(MacroContract.MacroEntry.COLUMN_MACRO_NAME, MACRO_SUGAR_DB_NAME);
                 whereClauseNameCondition = LOADER_DB_NAME_ARG + MACRO_SUGAR_DB_NAME + LOADER_ARG_CLOSE_QUOTE;
                 break;
         }
@@ -385,78 +380,11 @@ public class NutrientListActivity extends AppCompatActivity implements LoaderMan
         //The 'macro_name' in the where clause should match the quadrant and the update value
         //The date here should also ideally be today's date
         getContentResolver().update(MacroContract.MacroEntry.CONTENT_URI,contentValues, whereClauseNameCondition + " AND intake_date = '" + currentDate + LOADER_ARG_CLOSE_QUOTE, null);
+        Context context = this;
+        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+        RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.macro_widget);
+        ComponentName thisWidget = new ComponentName(context, MacroWidget.class);
+        remoteViews.setTextViewText(R.id.appwidget_text, "myText" + System.currentTimeMillis());
+        appWidgetManager.updateAppWidget(thisWidget, remoteViews);
     }
-
-//    private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
-//        recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(this, DummyContent.ITEMS, mTwoPane));
-//    }
-
-//    public static class SimpleItemRecyclerViewAdapter
-//            extends RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder> {
-//
-//        private final NutrientListActivity mParentActivity;
-//        private final List<DummyContent.DummyItem> mValues;
-//        private final boolean mTwoPane;
-//        private final View.OnClickListener mOnClickListener = new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                DummyContent.DummyItem item = (DummyContent.DummyItem) view.getTag();
-//                if (mTwoPane) {
-//                    Bundle arguments = new Bundle();
-//                    arguments.putString(NutrientDetailFragment.ARG_MACRO_ID, item.id);
-//                    NutrientDetailFragment fragment = new NutrientDetailFragment();
-//                    fragment.setArguments(arguments);
-//                    mParentActivity.getSupportFragmentManager().beginTransaction()
-//                            .replace(R.id.nutrient_detail_container, fragment)
-//                            .commit();
-//                } else {
-//                    Context context = view.getContext();
-//                    Intent intent = new Intent(context, NutrientDetailActivity.class);
-//                    intent.putExtra(NutrientDetailFragment.ARG_MACRO_ID, item.id);
-//
-//                    context.startActivity(intent);
-//                }
-//            }
-//        };
-//
-//        SimpleItemRecyclerViewAdapter(NutrientListActivity parent,
-//                                      List<DummyContent.DummyItem> items,
-//                                      boolean twoPane) {
-//            mValues = items;
-//            mParentActivity = parent;
-//            mTwoPane = twoPane;
-//        }
-//
-//        @Override
-//        public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-//            View view = LayoutInflater.from(parent.getContext())
-//                    .inflate(R.layout.nutrient_list_content, parent, false);
-//            return new ViewHolder(view);
-//        }
-//
-//        @Override
-//        public void onBindViewHolder(final ViewHolder holder, int position) {
-//            holder.mIdView.setText(mValues.get(position).id);
-//            holder.mContentView.setText(mValues.get(position).content);
-//
-//            holder.itemView.setTag(mValues.get(position));
-//            holder.itemView.setOnClickListener(mOnClickListener);
-//        }
-//
-//        @Override
-//        public int getItemCount() {
-//            return mValues.size();
-//        }
-//
-//        class ViewHolder extends RecyclerView.ViewHolder {
-//            final TextView mIdView;
-//            final TextView mContentView;
-//
-//            ViewHolder(View view) {
-//                super(view);
-//                mIdView = (TextView) view.findViewById(R.id.id_text);
-//                mContentView = (TextView) view.findViewById(R.id.content);
-//            }
-//        }
-//    }
 }

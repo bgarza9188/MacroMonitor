@@ -56,6 +56,15 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/macro_widget_info" />
         </receiver>
+
+        <activity
+            android:name=".SettingsActivity"
+            android:label="@string/title_activity_settings"
+            android:parentActivityName=".NutrientListActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.android.macromonitor.NutrientListActivity" />
+        </activity>
     </application>
 
 </manifest>

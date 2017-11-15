@@ -3,15 +3,61 @@
     <string name="title_nutrient_detail">Nutrient Detail</string>
 
     <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="ok">Ok</string>
     <string name="cancel">Cancel</string>
     <string name="update_button">Update</string>
     <string name="loading">Loading...</string>
     <string name="appwidget_text">Widget Text</string>
     <string name="add_widget">Add widget</string>
-    <string name="weight">Weight</string>
-    <string name="goals_preference_title">Nutrition Goals</string>
-    <string name="goals">Goals</string>
+
     <string name="settings">Settings</string>
+    <string name="title_activity_settings">Settings</string>
+
+    <!-- Strings related to Settings -->
+
+    <!-- General settings -->
+    <string name="pref_header_general">General</string>
+
+    <string name="pref_title_macros_to_track">Macros to Track</string>
+    <string name="pref_description_macros_to_track">Select at most 4 macro nutrients to track.
+    </string>
+    <string-array name="default_macro_pref_list">
+        <item>WATER</item>
+        <item>FAT</item>
+        <item>CARBOHYDRATES</item>
+        <item>SUGAR</item>
+    </string-array>
+    <string-array name="pref_macro_list_titles">
+        <item>Water</item>
+        <item>Fat</item>
+        <item>Carbs</item>
+        <item>Sugar</item>
+        <item>Protein</item>
+        <item>Calories</item>
+        <item>Sodium</item>
+    </string-array>
+    <string-array name="pref_macro_list_values">
+        <item>WATER</item>
+        <item>FAT</item>
+        <item>CARBOHYDRATES</item>
+        <item>SUGAR</item>
+        <item>PROTEIN</item>
+        <item>CALORIES</item>
+        <item>SODIUM</item>
+    </string-array>
+
+    <string name="pref_title_display_name">Display name</string>
+    <string name="pref_default_display_name">John Smith</string>
+
+    <string name="pref_title_add_nutrition_goals">Nutrition Goals</string>
+    <string-array name="pref_goals_list_titles">
+        <item>Maintain</item>
+        <item>Improve</item>
+        <item>Follow Recommended</item>
+    </string-array>
+    <string-array name="pref_goals_list_values">
+        <item>1</item>
+        <item>0</item>
+        <item>-1</item>
+    </string-array>
 </resources>
