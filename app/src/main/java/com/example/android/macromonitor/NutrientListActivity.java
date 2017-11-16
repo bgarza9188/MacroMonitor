@@ -37,7 +37,9 @@ import com.google.android.gms.tasks.Task;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.Date;
+import java.util.Map;
 import java.util.Set;
 
 import es.dmoral.toasty.Toasty;
@@ -193,29 +195,18 @@ public class NutrientListActivity extends AppCompatActivity implements LoaderMan
         macro_pref_array = selections.toArray(macro_pref_array);
         for(int loaderId = 0; loaderId < 4; loaderId++) {
             Log.e(LOG_TAG,"macro_pref_array value:" + macro_pref_array[loaderId] + " at loader:" + loaderId);
-        //    bundle.putString(LOADER_ARG_BUNDLE_KEY_SELECTION, LOADER_DB_NAME_ARG +  + LOADER_ARG_CLOSE_QUOTE);
-       //     getSupportLoaderManager().initLoader(loaderId, bundle, this);
+            bundle.putString(LOADER_ARG_BUNDLE_KEY_SELECTION, LOADER_DB_NAME_ARG + macro_pref_array[loaderId] + LOADER_ARG_CLOSE_QUOTE);
+            getSupportLoaderManager().initLoader(loaderId, bundle, this);
         }
     }
 
     private void initDBInserts(int loaderId) {
         ContentValues contentValues = new ContentValues();
-        switch (loaderId) {
-            case 0: contentValues.put(MacroContract.MacroEntry.COLUMN_MACRO_NAME, MACRO_WATER_DB_NAME);
-                break;
-            case 1: contentValues.put(MacroContract.MacroEntry.COLUMN_MACRO_NAME, MACRO_FAT_DB_NAME);
-                break;
-            case 2: contentValues.put(MacroContract.MacroEntry.COLUMN_MACRO_NAME, MACRO_CARB_DB_NAME);
-                break;
-            case 3: contentValues.put(MacroContract.MacroEntry.COLUMN_MACRO_NAME, MACRO_SUGAR_DB_NAME);
-                break;
-        }
+        contentValues.put(MacroContract.MacroEntry.COLUMN_MACRO_NAME, macro_pref_array[loaderId]);
         contentValues.put(MacroContract.MacroEntry.COLUMN_INTAKE_VALUE, 0);
         contentValues.put(MacroContract.MacroEntry.COLUMN_INTAKE_DATE, currentDate);
         getContentResolver().insert(MacroContract.MacroEntry.CONTENT_URI,contentValues);
     }
-
-
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -283,7 +274,7 @@ public class NutrientListActivity extends AppCompatActivity implements LoaderMan
         }
     }
 
-    //TODO this will be for when the user wants to launch the detail screen
+    //This will be for when the user wants to launch the detail screen
 
     private void updateUI(final int loaderId, String name, final int value) {
         switch (loaderId) {
@@ -293,7 +284,7 @@ public class NutrientListActivity extends AppCompatActivity implements LoaderMan
                     public void onClick(View view) {
                         if (mTwoPane) {
                             Bundle arguments = new Bundle();
-                            arguments.putInt(NutrientDetailFragment.ARG_MACRO_ID, loaderId);
+                            arguments.putString(NutrientDetailFragment.ARG_MACRO_ID, macro_pref_array[loaderId]);
                             NutrientDetailFragment fragment = new NutrientDetailFragment();
                             fragment.setArguments(arguments);
                             getSupportFragmentManager().beginTransaction()
@@ -301,7 +292,7 @@ public class NutrientListActivity extends AppCompatActivity implements LoaderMan
                                     .commit();
                         } else {
                             Intent intent = new Intent(getApplicationContext(), NutrientDetailActivity.class);
-                            intent.putExtra(NutrientDetailFragment.ARG_MACRO_ID, loaderId);
+                            intent.putExtra(NutrientDetailFragment.ARG_MACRO_ID, macro_pref_array[loaderId]);
                             startActivity(intent);
                         }
                     }});
@@ -312,6 +303,23 @@ public class NutrientListActivity extends AppCompatActivity implements LoaderMan
                     }});
                 break;
             case 1: textView_quadrant_two.setText("Name:" + name + " Value:" + value);
+                textView_quadrant_two.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        if (mTwoPane) {
+                            Bundle arguments = new Bundle();
+                            arguments.putString(NutrientDetailFragment.ARG_MACRO_ID, macro_pref_array[loaderId]);
+                            NutrientDetailFragment fragment = new NutrientDetailFragment();
+                            fragment.setArguments(arguments);
+                            getSupportFragmentManager().beginTransaction()
+                                    .replace(R.id.nutrient_detail_container, fragment)
+                                    .commit();
+                        } else {
+                            Intent intent = new Intent(getApplicationContext(), NutrientDetailActivity.class);
+                            intent.putExtra(NutrientDetailFragment.ARG_MACRO_ID, macro_pref_array[loaderId]);
+                            startActivity(intent);
+                        }
+                    }});
                 update_button_quadrant_two.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -320,6 +328,23 @@ public class NutrientListActivity extends AppCompatActivity implements LoaderMan
                 });
                 break;
             case 2: textView_quadrant_three.setText("Name:" + name + " Value:" + value);
+                textView_quadrant_three.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        if (mTwoPane) {
+                            Bundle arguments = new Bundle();
+                            arguments.putString(NutrientDetailFragment.ARG_MACRO_ID, macro_pref_array[loaderId]);
+                            NutrientDetailFragment fragment = new NutrientDetailFragment();
+                            fragment.setArguments(arguments);
+                            getSupportFragmentManager().beginTransaction()
+                                    .replace(R.id.nutrient_detail_container, fragment)
+                                    .commit();
+                        } else {
+                            Intent intent = new Intent(getApplicationContext(), NutrientDetailActivity.class);
+                            intent.putExtra(NutrientDetailFragment.ARG_MACRO_ID, macro_pref_array[loaderId]);
+                            startActivity(intent);
+                        }
+                    }});
                 update_button_quadrant_three.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -328,6 +353,23 @@ public class NutrientListActivity extends AppCompatActivity implements LoaderMan
                 });
                 break;
             case 3: textView_quadrant_four.setText("Name:" + name + " Value:" + value);
+                textView_quadrant_four.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        if (mTwoPane) {
+                            Bundle arguments = new Bundle();
+                            arguments.putString(NutrientDetailFragment.ARG_MACRO_ID, macro_pref_array[loaderId]);
+                            NutrientDetailFragment fragment = new NutrientDetailFragment();
+                            fragment.setArguments(arguments);
+                            getSupportFragmentManager().beginTransaction()
+                                    .replace(R.id.nutrient_detail_container, fragment)
+                                    .commit();
+                        } else {
+                            Intent intent = new Intent(getApplicationContext(), NutrientDetailActivity.class);
+                            intent.putExtra(NutrientDetailFragment.ARG_MACRO_ID, macro_pref_array[loaderId]);
+                            startActivity(intent);
+                        }
+                    }});
                 update_button_quadrant_four.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -358,21 +400,10 @@ public class NutrientListActivity extends AppCompatActivity implements LoaderMan
     private void updateDBIntakeValue(int loaderId, int value){
         //Make an update call to DB
         ContentValues contentValues = new ContentValues();
-        String whereClauseNameCondition = "";
-        switch (loaderId) {
-            case 0: contentValues.put(MacroContract.MacroEntry.COLUMN_MACRO_NAME, MACRO_WATER_DB_NAME);
-                whereClauseNameCondition = LOADER_DB_NAME_ARG + MACRO_WATER_DB_NAME + LOADER_ARG_CLOSE_QUOTE;
-                break;
-            case 1: contentValues.put(MacroContract.MacroEntry.COLUMN_MACRO_NAME, MACRO_FAT_DB_NAME);
-                whereClauseNameCondition = LOADER_DB_NAME_ARG + MACRO_FAT_DB_NAME + LOADER_ARG_CLOSE_QUOTE;
-                break;
-            case 2: contentValues.put(MacroContract.MacroEntry.COLUMN_MACRO_NAME, MACRO_CARB_DB_NAME);
-                whereClauseNameCondition = LOADER_DB_NAME_ARG + MACRO_CARB_DB_NAME + LOADER_ARG_CLOSE_QUOTE;
-                break;
-            case 3: contentValues.put(MacroContract.MacroEntry.COLUMN_MACRO_NAME, MACRO_SUGAR_DB_NAME);
-                whereClauseNameCondition = LOADER_DB_NAME_ARG + MACRO_SUGAR_DB_NAME + LOADER_ARG_CLOSE_QUOTE;
-                break;
-        }
+        String whereClauseNameCondition;
+
+        contentValues.put(MacroContract.MacroEntry.COLUMN_MACRO_NAME, macro_pref_array[loaderId]);
+        whereClauseNameCondition = LOADER_DB_NAME_ARG + macro_pref_array[loaderId] + LOADER_ARG_CLOSE_QUOTE;
 
         contentValues.put(MacroContract.MacroEntry.COLUMN_INTAKE_VALUE, value);
         //Ideally the date set here will be today's date
