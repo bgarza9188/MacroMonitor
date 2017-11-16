@@ -411,11 +411,9 @@ public class NutrientListActivity extends AppCompatActivity implements LoaderMan
         //The 'macro_name' in the where clause should match the quadrant and the update value
         //The date here should also ideally be today's date
         getContentResolver().update(MacroContract.MacroEntry.CONTENT_URI,contentValues, whereClauseNameCondition + " AND intake_date = '" + currentDate + LOADER_ARG_CLOSE_QUOTE, null);
-        Context context = this;
-        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
-        RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.macro_widget);
-        ComponentName thisWidget = new ComponentName(context, MacroWidget.class);
-        remoteViews.setTextViewText(R.id.appwidget_text, "myText" + System.currentTimeMillis());
-        appWidgetManager.updateAppWidget(thisWidget, remoteViews);
+        //Update the Widget-
+        int[] ids = AppWidgetManager.getInstance(getApplication()).getAppWidgetIds(new ComponentName(getApplication(), MacroWidget.class));
+        MacroWidget myWidget = new MacroWidget();
+        myWidget.onUpdate(this, AppWidgetManager.getInstance(this),ids);
     }
 }
