@@ -1,7 +1,6 @@
 package com.example.android.macromonitor;
 
 import android.app.Activity;
-import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -22,7 +21,6 @@ import com.androidplot.xy.StepMode;
 import com.androidplot.xy.XYGraphWidget;
 import com.androidplot.xy.XYPlot;
 import com.androidplot.xy.XYSeries;
-import com.example.android.macromonitor.data.MacroContract;
 
 import java.text.DateFormat;
 import java.text.DecimalFormat;
@@ -33,11 +31,6 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
-
-import static com.example.android.macromonitor.NutrientListActivity.COL_INTAKE_DATE;
-import static com.example.android.macromonitor.NutrientListActivity.COL_INTAKE_VALUE;
-import static com.example.android.macromonitor.NutrientListActivity.COL_MACRO_ENTRY_ID;
-import static com.example.android.macromonitor.NutrientListActivity.COL_MACRO_NAME;
 
 /**
  * A fragment representing a single Nutrient detail screen.
@@ -108,30 +101,11 @@ public class NutrientDetailFragment extends Fragment  implements MacroConstants{
 //        Log.e("ben", "Date at end of week:" + weekEndDate);
 
         Number[] intakeValues = new Number[7];
+        MacroIntentService service = new MacroIntentService();
+        service.startActionFetchWeek(getActivity(), MACRO_NAME, weekStartDate);
 
-        for(int i=0;i<7;i++) {
-            if(i != 0)
-                calender.add(Calendar.DATE, 1);
-            Date date1 = calender.getTime();
-            String weekDayDate = df.format(date1);
-            Cursor cursor = getActivity().getContentResolver().query(MacroContract.MacroEntry.CONTENT_URI,
-                    NutrientListActivity.MACRO_COLUMNS,
-                    LOADER_DB_NAME_ARG + MACRO_NAME + LOADER_ARG_CLOSE_QUOTE + " AND intake_date = '" + weekDayDate + "'",
-                    null,
-                    SORT_ORDER_LATEST_RECORD);
-            Log.e("ben","weekDayDate:" + weekDayDate);
-            if (cursor == null || (cursor != null && cursor.getCount() == 0)) {
-                Log.e("ben", "cursor was null :/");
-                intakeValues[i] = 0;
-            } else {
-                Log.e("ben", "cursor not null!");
-                cursor.moveToFirst();
-                do {
-                    Log.e("ben", "cursor ID: " + cursor.getInt(COL_MACRO_ENTRY_ID) + " cursor macro name:" + cursor.getString(COL_MACRO_NAME) + " cursor date:" + cursor.getString(COL_INTAKE_DATE) + " cursor Value:" + cursor.getInt(COL_INTAKE_VALUE));
-                    intakeValues[i] = cursor.getInt(COL_INTAKE_VALUE);
-                } while (cursor.moveToNext());
-            }
-        }
+
+
 
 
 

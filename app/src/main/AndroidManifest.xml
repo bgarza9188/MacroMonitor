@@ -65,6 +65,10 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.android.macromonitor.NutrientListActivity" />
         </activity>
+
+        <service
+            android:name=".MacroIntentService"
+            android:exported="false"></service>
     </application>
 
 </manifest>
