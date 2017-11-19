@@ -35,7 +35,7 @@ public class MacroWidget extends AppWidgetProvider implements MacroConstants {
         DateFormat df = new SimpleDateFormat(DATE_FORMAT_DB_PATTERN);
         today = df.format(new Date());
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
-        Set<String> selections = sharedPref.getStringSet("macro_pref_list",null);
+        Set<String> selections = sharedPref.getStringSet(MACRO_PREF_LIST,null);
         Cursor cursor = context.getContentResolver().query(MacroContract.MacroEntry.CONTENT_URI,
                 NutrientListActivity.MACRO_COLUMNS,
                 LOADER_DB_NAME_ARG + selections.toArray()[0] + LOADER_ARG_CLOSE_QUOTE + " AND intake_date = '" + today + "'",
@@ -46,7 +46,21 @@ public class MacroWidget extends AppWidgetProvider implements MacroConstants {
         } else {
             Log.e("ben", "cursor not null!");
             cursor.moveToFirst();
-            widgetText = cursor.getString(1) + " Intake:\n" + cursor.getString(2) + " of Goal";
+            StringBuilder builder = new StringBuilder();
+            String[] macroStringArray = context.getResources().getStringArray(R.array.pref_macro_list_titles);
+            String[] macroDBStringArray = context.getResources().getStringArray(R.array.pref_macro_list_values);
+            String[] goalStringArray = context.getResources().getStringArray(R.array.macro_goal_values);
+            for(int i=0;i<macroDBStringArray.length;i++){
+                if(macroDBStringArray[i].equalsIgnoreCase(cursor.getString(NutrientListActivity.COL_MACRO_NAME))){
+                    builder.append(macroStringArray[i]);
+                    builder.append(context.getString(R.string.colon_text));
+                    builder.append("\n");
+                    builder.append(cursor.getString(NutrientListActivity.COL_INTAKE_VALUE));
+                    builder.append(context.getString(R.string.of_text));
+                    builder.append(goalStringArray[i]);
+                }
+            }
+            widgetText = builder.toString();
         }
         views.setTextViewText(R.id.appwidget_text, widgetText);
         views.setOnClickPendingIntent(R.id.widget, configPendingIntent);
@@ -72,5 +86,7 @@ public class MacroWidget extends AppWidgetProvider implements MacroConstants {
     public void onDisabled(Context context) {
         // Enter relevant functionality for when the last widget is disabled
     }
+
+
 }
 

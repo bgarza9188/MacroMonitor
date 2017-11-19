@@ -22,13 +22,12 @@ import static com.example.android.macromonitor.NutrientListActivity.COL_MACRO_NA
  * An {@link IntentService} subclass for handling asynchronous task requests in
  * a service on a separate handler thread.
  * <p>
- * TODO: Customize class - update intent actions, extra parameters and static
  * helper methods.
  */
 public class MacroIntentService extends IntentService implements MacroConstants{
 
     private static final String ACTION_FETCH = "com.example.android.macromonitor.action.FETCH";
-    private static final String ACTION_BAZ = "com.example.android.macromonitor.action.BAZ";
+    public static final String FETCHED_DATA = "fetched_data";
 
     private static final String EXTRA_MACRO_NAME = "com.example.android.macromonitor.extra.NAME";
     private static final String EXTRA_START_DATE = "com.example.android.macromonitor.extra.DATE";
@@ -51,21 +50,6 @@ public class MacroIntentService extends IntentService implements MacroConstants{
         context.startService(intent);
     }
 
-    /**
-     * Starts this service to perform action Baz with the given parameters. If
-     * the service is already performing a task this action will be queued.
-     *
-     * @see IntentService
-     */
-    // TODO: Customize helper method
-    public static void startActionBaz(Context context, String param1, String param2) {
-        Intent intent = new Intent(context, MacroIntentService.class);
-        intent.setAction(ACTION_BAZ);
-        intent.putExtra(EXTRA_MACRO_NAME, param1);
-        intent.putExtra(EXTRA_START_DATE, param2);
-        context.startService(intent);
-    }
-
     @Override
     protected void onHandleIntent(Intent intent) {
         if (intent != null) {
@@ -74,10 +58,6 @@ public class MacroIntentService extends IntentService implements MacroConstants{
                 final String param1 = intent.getStringExtra(EXTRA_MACRO_NAME);
                 final String param2 = intent.getStringExtra(EXTRA_START_DATE);
                 handleActionFetchWeek(param1, param2);
-            } else if (ACTION_BAZ.equals(action)) {
-                final String param1 = intent.getStringExtra(EXTRA_MACRO_NAME);
-                final String param2 = intent.getStringExtra(EXTRA_START_DATE);
-                handleActionBaz(param1, param2);
             }
         }
     }
@@ -88,7 +68,7 @@ public class MacroIntentService extends IntentService implements MacroConstants{
      */
     private void handleActionFetchWeek(String macroName, String weekDayDate) {
 
-        Number[] intakeValues = new Number[7];
+        int[] intakeValues = new int[7];
         Calendar calender = Calendar.getInstance();
         int dayOfWeek = calender.get(Calendar.DAY_OF_WEEK);
         DateFormat df = new SimpleDateFormat(DATE_FORMAT_DB_PATTERN);
@@ -119,14 +99,10 @@ public class MacroIntentService extends IntentService implements MacroConstants{
                 } while (cursor.moveToNext());
             }
         }
-    }
-
-    /**
-     * Handle action Baz in the provided background thread with the provided
-     * parameters.
-     */
-    private void handleActionBaz(String param1, String param2) {
-        // TODO: Handle action Baz
-        throw new UnsupportedOperationException("Not yet implemented");
+        Intent broadcastIntent = new Intent();
+        broadcastIntent.setAction(NutrientDetailFragment.ResponseReceiver.ACTION_RESP);
+        broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
+        broadcastIntent.putExtra(FETCHED_DATA, intakeValues);
+        sendBroadcast(broadcastIntent);
     }
 }

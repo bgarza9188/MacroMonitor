@@ -1,6 +1,10 @@
 package com.example.android.macromonitor;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -41,6 +45,10 @@ import java.util.Date;
 public class NutrientDetailFragment extends Fragment  implements MacroConstants{
 
     private XYPlot plot;
+    private XYSeries series;
+    private BarFormatter bf;
+    private ResponseReceiver receiver;
+    private IntentFilter intentFilter;
 
     /**
      * The fragment argument representing the item ID that this fragment
@@ -49,6 +57,7 @@ public class NutrientDetailFragment extends Fragment  implements MacroConstants{
     public static final String ARG_MACRO_ID = "macro_id";
 
     public static String MACRO_NAME;
+    private static String macroDisplayName;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -62,17 +71,30 @@ public class NutrientDetailFragment extends Fragment  implements MacroConstants{
         super.onCreate(savedInstanceState);
 
         if (getArguments().containsKey(ARG_MACRO_ID)) {
-            // Load the content specified by the fragment
-            // arguments. In a real-world scenario, use a Loader
-            // to load content from a content provider.
             MACRO_NAME = getArguments().getString(ARG_MACRO_ID);
+            macroDisplayName = getMacroDisplayName(MACRO_NAME);
             Log.e("ben","macro name:" + MACRO_NAME);
             Activity activity = this.getActivity();
-            CollapsingToolbarLayout appBarLayout = (CollapsingToolbarLayout) activity.findViewById(R.id.toolbar_layout);
+            CollapsingToolbarLayout appBarLayout = activity.findViewById(R.id.toolbar_layout);
             if (appBarLayout != null) {
-                appBarLayout.setTitle(MACRO_NAME);
+                appBarLayout.setTitle(macroDisplayName);
             }
         }
+        intentFilter = new IntentFilter(ResponseReceiver.ACTION_RESP);
+        intentFilter.addCategory(Intent.CATEGORY_DEFAULT);
+        receiver = new ResponseReceiver();
+        getActivity().registerReceiver(receiver, intentFilter);
+    }
+
+    private String getMacroDisplayName(String macroName) {
+        String[] macroStringArray = getResources().getStringArray(R.array.pref_macro_list_titles);
+        String[] macroDBStringArray = getResources().getStringArray(R.array.pref_macro_list_values);
+        for(int i=0;i<macroDBStringArray.length;i++){
+            if(macroDBStringArray[i].equalsIgnoreCase(macroName)){
+                return macroStringArray[i];
+            }
+        }
+        return null;
     }
 
     @Override
@@ -83,35 +105,23 @@ public class NutrientDetailFragment extends Fragment  implements MacroConstants{
 
         //Week dates logics
         Calendar calender = Calendar.getInstance();
-        // calender.add(Calendar.DATE,1);
         Log.e("ben", "Current DAY OF WEEK:" + calender.get(Calendar.DAY_OF_WEEK));
         int dayOfWeek = calender.get(Calendar.DAY_OF_WEEK);
         Log.e("ben","-dayOFWeek+1:" + (-dayOfWeek+1));
         calender.add(Calendar.DATE,(-dayOfWeek+1));//Day of week numbers start at 1
         Date date = calender.getTime();
-        // Log.e("ben","Current WEEK OF YEAR:" + calender.get(Calendar.WEEK_OF_YEAR));
         DateFormat df = new SimpleDateFormat(DATE_FORMAT_DB_PATTERN);
         DateFormat readableDateFormat = new SimpleDateFormat("yyyy-MM-dd");
         String readableStartDate = readableDateFormat.format(date);
         String weekStartDate = df.format(date);
         Log.e("ben", "Date at beginning of week:" + weekStartDate);
-//        calender.add(Calendar.DATE, 6);//Get end of week
-//        Date newDate = calender.getTime();
-//        String weekEndDate = df.format(newDate);
-//        Log.e("ben", "Date at end of week:" + weekEndDate);
 
         Number[] intakeValues = new Number[7];
         MacroIntentService service = new MacroIntentService();
         service.startActionFetchWeek(getActivity(), MACRO_NAME, weekStartDate);
 
-
-
-
-
-
         // create a bar formatter with a red fill color and a black outline:
-        BarFormatter bf = new BarFormatter(Color.RED, Color.BLACK);
-        XYSeries series;
+        bf = new BarFormatter(Color.RED, Color.BLACK);
         plot.getGraph().getLineLabelStyle(XYGraphWidget.Edge.BOTTOM).setFormat(new Format() {
             @Override
             public StringBuffer format(Object obj, StringBuffer toAppendTo, FieldPosition pos) {
@@ -120,21 +130,21 @@ public class NutrientDetailFragment extends Fragment  implements MacroConstants{
                 int i = Math.round(((Number) obj).floatValue());
                 String dayOfWeek;
                 switch (i){
-                    case 0: dayOfWeek = "Sun.";
+                    case 0: dayOfWeek = getActivity().getString(R.string.sunday);
                         break;
-                    case 1: dayOfWeek = "Mon.";
+                    case 1: dayOfWeek = getActivity().getString(R.string.monday);
                         break;
-                    case 2: dayOfWeek = "Tue.";
+                    case 2: dayOfWeek = getActivity().getString(R.string.tuesday);
                         break;
-                    case 3: dayOfWeek = "Wed.";
+                    case 3: dayOfWeek = getActivity().getString(R.string.wednesday);
                         break;
-                    case 4: dayOfWeek = "Thu.";
+                    case 4: dayOfWeek = getActivity().getString(R.string.thursday);
                         break;
-                    case 5: dayOfWeek = "Fri.";
+                    case 5: dayOfWeek = getActivity().getString(R.string.friday);
                         break;
-                    case 6: dayOfWeek = "Sat.";
+                    case 6: dayOfWeek = getActivity().getString(R.string.saturady);
                         break;
-                    default: dayOfWeek = "Day";
+                    default: dayOfWeek = getActivity().getString(R.string.day);
                         break;
                 }
                 return toAppendTo.append(dayOfWeek);
@@ -148,10 +158,10 @@ public class NutrientDetailFragment extends Fragment  implements MacroConstants{
         //Displays the Range values as whole numbers instead of decimals
         plot.getGraph().getLineLabelStyle(XYGraphWidget.Edge.LEFT).setFormat(new DecimalFormat("0.0"));
         //Set Title
-        plot.setTitle(MACRO_NAME + " Intake");
+        plot.setTitle(macroDisplayName + getActivity().getString(R.string.intake));
         //Sets the values to the specified Androidplot series
         series = new SimpleXYSeries(  Arrays.asList(intakeValues),
-                SimpleXYSeries.ArrayFormat.Y_VALS_ONLY, "Daily Intake");
+                SimpleXYSeries.ArrayFormat.Y_VALS_ONLY, getActivity().getString(R.string.daily_intake));
         //Add series to the plot
         plot.addSeries(series, bf);
         //This will divide the domain values into 7 distinct sections(Mon-Sun)
@@ -168,9 +178,43 @@ public class NutrientDetailFragment extends Fragment  implements MacroConstants{
 
 
         // Show the content as text in a TextView.
-        ((TextView) rootView.findViewById(R.id.nutrient_detail)).setText("Week Starting on: " + readableStartDate);
+        ((TextView) rootView.findViewById(R.id.nutrient_detail)).setText(getActivity().getString(R.string.week_starting_on) + readableStartDate);
 
 
         return rootView;
+    }
+    @Override
+    public void onResume() {
+        super.onResume();
+        //registering receiver
+        getActivity().registerReceiver(receiver, intentFilter);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        //unregister receiver
+        getActivity().unregisterReceiver(receiver);
+    }
+
+    public class ResponseReceiver extends BroadcastReceiver {
+        public static final String ACTION_RESP =
+                "com.example.android.macromonitor.DATA_PROCESSED";
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            plot.removeSeries(series);
+            int[] responseData = intent.getIntArrayExtra(MacroIntentService.FETCHED_DATA);
+            Number[] intakeValues = new Number[7];
+            for(int i=0;i<7;i++){
+                intakeValues[i] = responseData[i];
+            }
+            series = new SimpleXYSeries(  Arrays.asList(intakeValues),
+                    SimpleXYSeries.ArrayFormat.Y_VALS_ONLY, getActivity().getString(R.string.daily_intake));
+            //Add series to the plot
+            plot.addSeries(series, bf);
+            plot.redraw();
+            Log.e("ben","plot is updated!");
+        }
     }
 }

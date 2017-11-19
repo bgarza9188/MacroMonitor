@@ -1,13 +1,6 @@
 package com.example.android.macromonitor;
 
-import android.support.annotation.NonNull;
-
 import com.example.android.macromonitor.data.MacroContract;
-
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Created by jebus on 11/8/2017.
@@ -21,10 +14,10 @@ public interface MacroConstants {
     String MACRO_PROTEIN_DB_NAME = "PROTEIN";
     String MACRO_CALORIES_DB_NAME = "CALORIES";
     String MACRO_SODIUM_DB_NAME = "SODIUM";
+    String MACRO_PREF_LIST = "macro_pref_list";
     String LOADER_DB_NAME_ARG = MacroContract.MacroEntry.COLUMN_MACRO_NAME + " = '";
     String LOADER_ARG_CLOSE_QUOTE = "'";
     String LOADER_ARG_BUNDLE_KEY_SELECTION = "SELECTION";
     String SORT_ORDER_LATEST_RECORD = MacroContract.MacroEntry.COLUMN_INTAKE_DATE + " DESC LIMIT 1";
-    String SORT_ORDER_LATEST_SEVEN_RECORDS = MacroContract.MacroEntry.COLUMN_INTAKE_DATE + " ASC LIMIT 7";
     String DATE_FORMAT_DB_PATTERN = "yyyyMMdd";
 }

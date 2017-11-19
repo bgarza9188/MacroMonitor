@@ -7,7 +7,7 @@
     <string name="cancel">Cancel</string>
     <string name="update_button">Update</string>
     <string name="loading">Loading...</string>
-    <string name="appwidget_text">Widget Text</string>
+    <string name="appwidget_text">Macro Monitor</string>
     <string name="add_widget">Add widget</string>
 
     <string name="settings">Settings</string>
@@ -45,6 +45,15 @@
         <item>CALORIES</item>
         <item>SODIUM</item>
     </string-array>
+    <string-array name="macro_goal_values">
+        <item>64oz</item>
+        <item>32 grams</item>
+        <item>79 grams</item>
+        <item>28 grams</item>
+        <item>12 grams</item>
+        <item>2000 calories</item>
+        <item>45 milligrams</item>
+    </string-array>
 
     <string name="pref_title_display_name">Display name</string>
     <string name="pref_default_display_name">John Smith</string>
@@ -60,4 +69,21 @@
         <item>0</item>
         <item>-1</item>
     </string-array>
+    <string name="successful_signin">Successful Sign in!</string>
+    <string name="friendly_err_msg">Something went wrong. :(</string>
+    <string name="of_text">&#160;of&#160;</string>
+    <string name="colon_text">:</string>
+    <string name="sunday">Sun.</string>
+    <string name="monday">Mon.</string>
+    <string name="tuesday">Tue.</string>
+    <string name="wednesday">Wed.</string>
+    <string name="thursday">Thu.</string>
+    <string name="friday">Fri.</string>
+    <string name="saturady">Sat.</string>
+    <string name="day">Day</string>
+    <string name="daily_intake">Daily Intake</string>
+    <string name="week_starting_on">Week starting on:&#160;</string>
+    <string name="intake">&#160;Intake</string>
+    <string name="domain_title">Day of Week</string>
+    <string name="range_title">Intake in Units</string>
 </resources>

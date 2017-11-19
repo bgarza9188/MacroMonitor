@@ -3,7 +3,6 @@ package com.example.android.macromonitor;
 import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
 import android.content.ContentValues;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -20,7 +19,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.RemoteViews;
 import android.widget.TextView;
 
 import com.example.android.macromonitor.data.MacroContract;
@@ -37,9 +35,7 @@ import com.google.android.gms.tasks.Task;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Collections;
 import java.util.Date;
-import java.util.Map;
 import java.util.Set;
 
 import es.dmoral.toasty.Toasty;
@@ -226,13 +222,12 @@ public class NutrientListActivity extends AppCompatActivity implements LoaderMan
             GoogleSignInAccount account = completedTask.getResult(ApiException.class);
 
             // Signed in successfully, show authenticated UI.
-            Toasty.success(this, "Successful sign in!").show();
+            Toasty.success(this, getString(R.string.successful_signin)).show();
         } catch (ApiException e) {
             // The ApiException status code indicates the detailed failure reason.
             // Please refer to the GoogleSignInStatusCodes class reference for more information.
             Log.w(TAG, "signInResult:failed code=" + e.getStatusCode());
-            //updateUI(null);
-            Toasty.error(this, "Api Exception :(").show();
+            Toasty.error(this, getString(R.string.friendly_err_msg)).show();
         }
     }
 
@@ -278,7 +273,7 @@ public class NutrientListActivity extends AppCompatActivity implements LoaderMan
 
     private void updateUI(final int loaderId, String name, final int value) {
         switch (loaderId) {
-            case 0: textView_quadrant_one.setText("Name:" + name + " Value:" + value);
+            case 0: textView_quadrant_one.setText(getNutrientText(name, value));
                 textView_quadrant_one.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -302,7 +297,7 @@ public class NutrientListActivity extends AppCompatActivity implements LoaderMan
                         UpdateNutrientDialogFragment.newInstance(loaderId).show(getSupportFragmentManager(), "Update Alert");
                     }});
                 break;
-            case 1: textView_quadrant_two.setText("Name:" + name + " Value:" + value);
+            case 1: textView_quadrant_two.setText(getNutrientText(name, value));
                 textView_quadrant_two.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -327,7 +322,7 @@ public class NutrientListActivity extends AppCompatActivity implements LoaderMan
                     }
                 });
                 break;
-            case 2: textView_quadrant_three.setText("Name:" + name + " Value:" + value);
+            case 2: textView_quadrant_three.setText(getNutrientText(name, value));
                 textView_quadrant_three.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -352,7 +347,7 @@ public class NutrientListActivity extends AppCompatActivity implements LoaderMan
                     }
                 });
                 break;
-            case 3: textView_quadrant_four.setText("Name:" + name + " Value:" + value);
+            case 3: textView_quadrant_four.setText(getNutrientText(name, value));
                 textView_quadrant_four.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -379,6 +374,24 @@ public class NutrientListActivity extends AppCompatActivity implements LoaderMan
                 break;
         }
 
+    }
+
+    private String getNutrientText(String name, int value) {
+        StringBuilder builder = new StringBuilder();
+        String[] macroStringArray = getResources().getStringArray(R.array.pref_macro_list_titles);
+        String[] macroDBStringArray = getResources().getStringArray(R.array.pref_macro_list_values);
+        String[] goalStringArray = getResources().getStringArray(R.array.macro_goal_values);
+        for(int i=0;i<macroDBStringArray.length;i++){
+            if(macroDBStringArray[i].equalsIgnoreCase(name)){
+                builder.append(macroStringArray[i]);
+                builder.append(getString(R.string.colon_text));
+                builder.append("\n");
+                builder.append(value);
+                builder.append(getString(R.string.of_text));
+                builder.append(goalStringArray[i]);
+            }
+        }
+        return builder.toString();
     }
 
     @Override

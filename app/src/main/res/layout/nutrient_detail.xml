@@ -10,12 +10,12 @@
         android:layout_width="match_parent"
         android:layout_height="300dp"
         android:background="@color/ap_gray"
-        app:domainTitle="Day of Week"
+        app:domainTitle="@string/domain_title"
         app:gridClippingEnabled="false"
         app:lineLabelInsetLeft="32dp"
         app:gridInsetLeft="35dp"
         app:gridInsetRight="10dp"
-        app:rangeTitle="Intake in Units" />
+        app:rangeTitle="@string/range_title" />
 
     <TextView xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
