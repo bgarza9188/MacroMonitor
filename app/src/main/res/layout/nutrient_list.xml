@@ -9,19 +9,20 @@
     android:layout_height="match_parent"
     app:layoutManager="LinearLayoutManager"
     tools:context="com.example.android.macromonitor.NutrientListActivity">
+
     <View
         android:id="@+id/horizontalDivider"
-        android:layout_width="2dp"
+        android:layout_width="match_parent"
         android:layout_height="2dp"
         android:layout_centerVertical="true"
-        android:background="@color/off_white"/>
+        android:background="@color/black" />
 
     <View
         android:id="@+id/verticalDivider"
         android:layout_width="2dp"
-        android:layout_height="2dp"
+        android:layout_height="match_parent"
         android:layout_centerHorizontal="true"
-        android:background="@color/off_white"/>
+        android:background="@color/black" />
 
     <RelativeLayout
         android:id="@+id/quadrant_one"

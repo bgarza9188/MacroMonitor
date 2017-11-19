@@ -91,4 +91,5 @@
     <string name="sign_out">Sign Out</string>
     <string name="welcome">Welcome!</string>
     <string name="exclamation">!</string>
+    <string name="viewing_instruction">Click a macro on the left to view it\'s chart here.</string>
 </resources>
