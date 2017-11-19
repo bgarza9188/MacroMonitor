@@ -4,25 +4,29 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.media.Ringtone;
-import android.media.RingtoneManager;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
 import android.preference.ListPreference;
-import android.preference.MultiSelectListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
-import android.support.v7.app.ActionBar;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
-import android.preference.RingtonePreference;
-import android.text.TextUtils;
-import android.util.Log;
-import android.view.MenuItem;
+import android.support.annotation.NonNull;
 import android.support.v4.app.NavUtils;
+import android.support.v7.app.ActionBar;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.widget.Toast;
+
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 
 import java.util.List;
 import java.util.Set;
@@ -42,6 +46,7 @@ import es.dmoral.toasty.Toasty;
  */
 public class SettingsActivity extends AppCompatPreferenceActivity {
 
+    private static final String LOG_TAG = SettingsActivity.class.getSimpleName();
     /**
      * A preference value change listener that updates the preference's summary
      * to reflect its new value.
@@ -50,7 +55,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         @Override
         public boolean onPreferenceChange(Preference preference, Object value) {
             String stringValue = value.toString();
-            Log.e("ben","onPrefChange");
             if (preference instanceof ListPreference) {
                 // For list preferences, look up the correct display value in
                 // the preference's 'entries' list.
@@ -64,6 +68,12 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                                 : null);
 
             } else if(preference instanceof EditTextPreference){
+                for(int index = 0; index<stringValue.length(); index++){
+                    if(!Character.isLetter(stringValue.codePointAt(index)) || stringValue.isEmpty() || stringValue == null) {
+                        Log.w(LOG_TAG, "User inputted invalid name.");
+                        return false;
+                    }
+                }
                 // For EditTextPreference preferences, set the summary to the value's
                 // simple string representation.
                 preference.setSummary(stringValue);
@@ -101,6 +111,46 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                         .getDefaultSharedPreferences(preference.getContext())
                         .getString(preference.getKey(), ""));
 
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
+        if(account == null){
+            return false;
+        }
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_settings, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.log_out_option:
+                Log.e(LOG_TAG,"Signing out");
+                signOut();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void signOut() {
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .build();
+
+        // Build a GoogleSignInClient with the options specified by gso.
+        GoogleSignInClient mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+        mGoogleSignInClient.signOut()
+                .addOnCompleteListener(this, new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        Toasty.success(SettingsActivity.this, "Signed out", Toast.LENGTH_LONG).show();
+                    }
+                });
     }
 
     @Override
@@ -176,20 +226,14 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             // guidelines.
             bindPreferenceSummaryToValue(findPreference("display_name_text"));
             bindPreferenceSummaryToValue(findPreference("goals_pref_list"));
-            Preference pref = findPreference("macro_pref_list");
-            pref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            Preference macro_preference = findPreference("macro_pref_list");
+            macro_preference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                 @Override
                 public boolean onPreferenceChange(Preference preference, Object newValue) {
-                    Log.e("ben","in onPrefChange for multiselect");
                     Set<String> values = (Set<String>) newValue;
 
-                    Log.e("ben","size of values"+ values.size());
-                    for(String s: values){
-                        Log.e("ben","string value:"+ s);
-                    }
                     if(values.size() > 4 || values.size() < 4) {
-
-                        Toasty.error(getActivity(),"Please select only four macros.", Toast.LENGTH_LONG).show();
+                        Toasty.error(getActivity(),getActivity().getString(R.string.only_four_macros), Toast.LENGTH_LONG).show();
                         return false;
                     }
                     // true to update the state of the Preference with the new value

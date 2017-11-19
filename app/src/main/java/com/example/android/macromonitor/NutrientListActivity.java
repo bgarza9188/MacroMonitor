@@ -20,6 +20,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.android.macromonitor.data.MacroContract;
 import com.google.android.gms.ads.AdRequest;
@@ -50,7 +51,7 @@ import es.dmoral.toasty.Toasty;
  */
 public class NutrientListActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>,MacroConstants,UpdateNutrientDialogFragment.NoticeDialogListener {
 
-    private final String LOG_TAG = NutrientListActivity.class.getSimpleName();
+    private static final String LOG_TAG = NutrientListActivity.class.getSimpleName();
 
     private static final int RC_SIGN_IN = 86;
     private String[] macro_pref_array = new String[4];
@@ -74,7 +75,6 @@ public class NutrientListActivity extends AppCompatActivity implements LoaderMan
     public static final int COL_MACRO_NAME = 1;
     public static final int COL_INTAKE_VALUE = 2;
     public static final int COL_INTAKE_DATE = 3;
-    private static final String TAG = NutrientListActivity.class.getSimpleName();
     private String currentDate;
     /**
      * Whether or not the activity is in two-pane mode, i.e. running on a tablet
@@ -83,13 +83,15 @@ public class NutrientListActivity extends AppCompatActivity implements LoaderMan
     private boolean mTwoPane;
     private AdView mAdView;
     private GoogleSignInClient mGoogleSignInClient;
+    private SignInButton signInButton;
+    private SharedPreferences sharedPref;
 
     @Override
     protected void onStart(){
         super.onStart();
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
         if(account != null){
-            Toasty.info(this, "User is signed in !").show();
+            signInButton.setVisibility(View.GONE);
         }
     }
 
@@ -139,7 +141,7 @@ public class NutrientListActivity extends AppCompatActivity implements LoaderMan
         // Build a GoogleSignInClient with the options specified by gso.
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
 
-        SignInButton signInButton = findViewById(R.id.sign_in_button);
+        signInButton = findViewById(R.id.sign_in_button);
         signInButton.setSize(SignInButton.SIZE_STANDARD);
         signInButton.setOnClickListener(new View.OnClickListener(){
             @Override
@@ -148,7 +150,6 @@ public class NutrientListActivity extends AppCompatActivity implements LoaderMan
                     case R.id.sign_in_button:
                         signIn();
                         break;
-                    // ...
                 }
             }
 
@@ -180,13 +181,11 @@ public class NutrientListActivity extends AppCompatActivity implements LoaderMan
         textView_quadrant_four = findViewById(R.id.quadrant_four_text);
         update_button_quadrant_four = findViewById(R.id.quadrant_four_update_button);
 
-        Log.e("Date",currentDate);
         //This will init a loader that will pull all rows
         //getSupportLoaderManager().initLoader(MACRO_LOADER_ONE, null, this);
         Bundle bundle = new Bundle();
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         Set<String> selections = sharedPref.getStringSet("macro_pref_list",null);
-        Log.e(LOG_TAG,"ben selections size:" + selections.size());
 
         macro_pref_array = selections.toArray(macro_pref_array);
         for(int loaderId = 0; loaderId < 4; loaderId++) {
@@ -207,7 +206,7 @@ public class NutrientListActivity extends AppCompatActivity implements LoaderMan
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Log.e(TAG, "Ben Inside 'onActivityResult', requestCode:" + requestCode);
+        Log.e(LOG_TAG, "Ben Inside 'onActivityResult', requestCode:" + requestCode);
         // Result returned from launching the Intent from GoogleSignInClient.getSignInIntent(...);
         if (requestCode == RC_SIGN_IN) {
             // The Task returned from this call is always completed, no need to attach
@@ -221,12 +220,22 @@ public class NutrientListActivity extends AppCompatActivity implements LoaderMan
         try {
             GoogleSignInAccount account = completedTask.getResult(ApiException.class);
 
+            String[] displayName = account.getDisplayName().split("\\s+");
+
             // Signed in successfully, show authenticated UI.
-            Toasty.success(this, getString(R.string.successful_signin)).show();
+            if(displayName[0] != null || !displayName[0].isEmpty()) {
+                Toasty.success(this, getString(R.string.successful_signin) + displayName[0] + getString(R.string.exclamation), Toast.LENGTH_LONG).show();
+            } else {
+                Toasty.success(this, getString(R.string.welcome), Toast.LENGTH_LONG).show();
+            }
+            signInButton.setVisibility(View.GONE);
+            SharedPreferences.Editor editor = sharedPref.edit();
+            editor.putString("display_name_text", displayName[0]);
+            editor.commit();
         } catch (ApiException e) {
             // The ApiException status code indicates the detailed failure reason.
             // Please refer to the GoogleSignInStatusCodes class reference for more information.
-            Log.w(TAG, "signInResult:failed code=" + e.getStatusCode());
+            Log.w(LOG_TAG, "signInResult:failed code=" + e.getStatusCode());
             Toasty.error(this, getString(R.string.friendly_err_msg)).show();
         }
     }
