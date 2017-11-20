@@ -2,11 +2,10 @@
     <string name="app_name">Macro Monitor</string>
     <string name="title_nutrient_detail">Nutrient Detail</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="ok">Ok</string>
+    <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
     <string name="update_button">Update</string>
-    <string name="loading">Loading...</string>
+    <string name="loading">Loading&#8230;</string>
     <string name="appwidget_text">Macro Monitor</string>
     <string name="add_widget">Add widget</string>
 
@@ -92,4 +91,6 @@
     <string name="welcome">Welcome!</string>
     <string name="exclamation">!</string>
     <string name="viewing_instruction">Click a macro on the left to view it\'s chart here.</string>
+    <string name="dialog_title">Update Nutrient Intake</string>
+    <string name="dialog_msg">Select a number:</string>
 </resources>

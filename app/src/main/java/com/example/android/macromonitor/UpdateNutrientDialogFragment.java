@@ -7,13 +7,10 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.NumberPicker;
-
-import es.dmoral.toasty.Toasty;
 
 
 /**
@@ -25,12 +22,8 @@ import es.dmoral.toasty.Toasty;
  * create an instance of this fragment.
  */
 public class UpdateNutrientDialogFragment extends DialogFragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
 
-    // TODO: Rename and change types of parameters
     private int loaderId;
 
     private NoticeDialogListener mListener;
@@ -59,20 +52,18 @@ public class UpdateNutrientDialogFragment extends DialogFragment {
         //Gets whether the selector wheel wraps when reaching the min/max value.
         numberPicker.setWrapSelectorWheel(true);
 
-        builder.setTitle("Update Nutrient Intake");
+        builder.setTitle(getActivity().getString(R.string.dialog_title));
 
-        builder.setMessage("Select a number:");
+        builder.setMessage(getActivity().getString(R.string.dialog_msg));
 
         builder.setView(rootView)
                 .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        Toasty.info(getActivity(), "User OK value:" + numberPicker.getValue()).show();
                         mListener.onDialogPositiveClick(UpdateNutrientDialogFragment.this, numberPicker.getValue(), loaderId);
                     }
                 })
                 .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        Toasty.info(getActivity(), "User Cancelled").show();
                         mListener.onDialogNegativeClick(UpdateNutrientDialogFragment.this);
                     }
                 });
@@ -88,7 +79,6 @@ public class UpdateNutrientDialogFragment extends DialogFragment {
      * @param loaderId Parameter 1.
      * @return A new instance of fragment UpdateNutrientDialogFragment.
      */
-    // TODO: Rename and change types and number of parameters
     public static UpdateNutrientDialogFragment newInstance(int loaderId) {
         UpdateNutrientDialogFragment fragment = new UpdateNutrientDialogFragment();
         Bundle args = new Bundle();
@@ -102,7 +92,6 @@ public class UpdateNutrientDialogFragment extends DialogFragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             loaderId = getArguments().getInt(ARG_PARAM1);
-            Log.e("diag. args","ben, loaderId:" + loaderId);
         }
     }
 
@@ -141,7 +130,7 @@ public class UpdateNutrientDialogFragment extends DialogFragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface NoticeDialogListener  {
-        public void onDialogPositiveClick(DialogFragment dialog, int value, int loaderId);
-        public void onDialogNegativeClick(DialogFragment dialog);
+        void onDialogPositiveClick(DialogFragment dialog, int value, int loaderId);
+        void onDialogNegativeClick(DialogFragment dialog);
     }
 }

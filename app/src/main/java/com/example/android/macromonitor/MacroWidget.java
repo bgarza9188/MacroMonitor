@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.widget.RemoteViews;
 
 import com.example.android.macromonitor.data.MacroContract;
@@ -25,7 +24,6 @@ public class MacroWidget extends AppWidgetProvider implements MacroConstants {
 
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
                                 int appWidgetId) {
-        Log.e("ben","updateAppWidget");
         CharSequence widgetText = context.getString(R.string.appwidget_text);
         // Construct the RemoteViews object
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.macro_widget);
@@ -36,15 +34,15 @@ public class MacroWidget extends AppWidgetProvider implements MacroConstants {
         today = df.format(new Date());
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
         Set<String> selections = sharedPref.getStringSet(MACRO_PREF_LIST,null);
-        Cursor cursor = context.getContentResolver().query(MacroContract.MacroEntry.CONTENT_URI,
-                NutrientListActivity.MACRO_COLUMNS,
-                LOADER_DB_NAME_ARG + selections.toArray()[0] + LOADER_ARG_CLOSE_QUOTE + " AND intake_date = '" + today + "'",
-                null,
-                SORT_ORDER_LATEST_RECORD);
-        if (cursor == null || (cursor != null && cursor.getCount() == 0)) {
-            Log.e("ben", "cursor was null :/");
-        } else {
-            Log.e("ben", "cursor not null!");
+        Cursor cursor = null;
+        if(selections != null) {
+            cursor = context.getContentResolver().query(MacroContract.MacroEntry.CONTENT_URI,
+                    NutrientListActivity.MACRO_COLUMNS,
+                    LOADER_DB_NAME_ARG + selections.toArray()[0] + LOADER_ARG_CLOSE_QUOTE + " AND intake_date = '" + today + "'",
+                    null,
+                    SORT_ORDER_LATEST_RECORD);
+        }
+        if (cursor != null && cursor.getCount() != 0) {
             cursor.moveToFirst();
             StringBuilder builder = new StringBuilder();
             String[] macroStringArray = context.getResources().getStringArray(R.array.pref_macro_list_titles);
@@ -62,6 +60,7 @@ public class MacroWidget extends AppWidgetProvider implements MacroConstants {
             }
             widgetText = builder.toString();
         }
+        cursor.close();
         views.setTextViewText(R.id.appwidget_text, widgetText);
         views.setOnClickPendingIntent(R.id.widget, configPendingIntent);
         // Instruct the widget manager to update the widget
@@ -70,23 +69,10 @@ public class MacroWidget extends AppWidgetProvider implements MacroConstants {
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
-        Log.e("ben","onUpdate");
         // There may be multiple widgets active, so update all of them
         for (int appWidgetId : appWidgetIds) {
             updateAppWidget(context, appWidgetManager, appWidgetId);
         }
     }
-
-    @Override
-    public void onEnabled(Context context) {
-        // Enter relevant functionality for when the first widget is created
-    }
-
-    @Override
-    public void onDisabled(Context context) {
-        // Enter relevant functionality for when the last widget is disabled
-    }
-
-
 }
 

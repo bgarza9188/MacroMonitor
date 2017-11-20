@@ -8,7 +8,6 @@ import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 /**
  * Created by jebus on 11/7/2017.
@@ -29,7 +28,6 @@ public class MacroProvider extends ContentProvider{
 
     @Override
     public boolean onCreate() {
-        Log.e(LOG_TAG, "Ben in onCreate");
         mOpenHelper = new MacroDbHelper(getContext());
         return true;
     }

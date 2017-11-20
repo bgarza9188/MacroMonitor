@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -73,7 +72,6 @@ public class NutrientDetailFragment extends Fragment  implements MacroConstants{
         if (getArguments().containsKey(ARG_MACRO_ID)) {
             MACRO_NAME = getArguments().getString(ARG_MACRO_ID);
             macroDisplayName = getMacroDisplayName(MACRO_NAME);
-            Log.e("ben","macro name:" + MACRO_NAME);
             Activity activity = this.getActivity();
             CollapsingToolbarLayout appBarLayout = activity.findViewById(R.id.toolbar_layout);
             if (appBarLayout != null) {
@@ -105,16 +103,13 @@ public class NutrientDetailFragment extends Fragment  implements MacroConstants{
 
         //Week dates logics
         Calendar calender = Calendar.getInstance();
-        Log.e("ben", "Current DAY OF WEEK:" + calender.get(Calendar.DAY_OF_WEEK));
         int dayOfWeek = calender.get(Calendar.DAY_OF_WEEK);
-        Log.e("ben","-dayOFWeek+1:" + (-dayOfWeek+1));
         calender.add(Calendar.DATE,(-dayOfWeek+1));//Day of week numbers start at 1
         Date date = calender.getTime();
         DateFormat df = new SimpleDateFormat(DATE_FORMAT_DB_PATTERN);
         DateFormat readableDateFormat = new SimpleDateFormat("yyyy-MM-dd");
         String readableStartDate = readableDateFormat.format(date);
         String weekStartDate = df.format(date);
-        Log.e("ben", "Date at beginning of week:" + weekStartDate);
 
         Number[] intakeValues = new Number[7];
         MacroIntentService service = new MacroIntentService();
@@ -176,10 +171,9 @@ public class NutrientDetailFragment extends Fragment  implements MacroConstants{
         BarRenderer barRenderer = plot.getRenderer(BarRenderer.class);
         barRenderer.setBarGroupWidth(BarRenderer.BarGroupWidthMode.FIXED_WIDTH, PixelUtils.dpToPix(10));
 
-
         // Show the content as text in a TextView.
-        ((TextView) rootView.findViewById(R.id.nutrient_detail)).setText(getActivity().getString(R.string.week_starting_on) + readableStartDate);
-
+        String descriptionText = getActivity().getString(R.string.week_starting_on) + readableStartDate;
+        ((TextView) rootView.findViewById(R.id.nutrient_detail)).setText(descriptionText);
 
         return rootView;
     }
@@ -214,7 +208,6 @@ public class NutrientDetailFragment extends Fragment  implements MacroConstants{
             //Add series to the plot
             plot.addSeries(series, bf);
             plot.redraw();
-            Log.e("ben","plot is updated!");
         }
     }
 }

@@ -69,7 +69,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
             } else if(preference instanceof EditTextPreference){
                 for(int index = 0; index<stringValue.length(); index++){
-                    if(!Character.isLetter(stringValue.codePointAt(index)) || stringValue.isEmpty() || stringValue == null) {
+                    if(!Character.isLetter(stringValue.codePointAt(index)) || stringValue.isEmpty()) {
                         Log.w(LOG_TAG, "User inputted invalid name.");
                         return false;
                     }
@@ -129,7 +129,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.log_out_option:
-                Log.e(LOG_TAG,"Signing out");
                 signOut();
                 return true;
             default:

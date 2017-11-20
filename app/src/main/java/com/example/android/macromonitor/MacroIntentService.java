@@ -4,7 +4,6 @@ import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.util.Log;
 
 import com.example.android.macromonitor.data.MacroContract;
 
@@ -13,10 +12,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
-import static com.example.android.macromonitor.NutrientListActivity.COL_INTAKE_DATE;
 import static com.example.android.macromonitor.NutrientListActivity.COL_INTAKE_VALUE;
-import static com.example.android.macromonitor.NutrientListActivity.COL_MACRO_ENTRY_ID;
-import static com.example.android.macromonitor.NutrientListActivity.COL_MACRO_NAME;
 
 /**
  * An {@link IntentService} subclass for handling asynchronous task requests in
@@ -73,7 +69,7 @@ public class MacroIntentService extends IntentService implements MacroConstants{
         int dayOfWeek = calender.get(Calendar.DAY_OF_WEEK);
         DateFormat df = new SimpleDateFormat(DATE_FORMAT_DB_PATTERN);
         calender.add(Calendar.DATE,(-dayOfWeek+1));
-
+        Cursor cursor = null;
         for(int i=0;i<7;i++) {
             if(i != 0) {
                 //Initial parameter should be a formatted proper date.
@@ -81,24 +77,21 @@ public class MacroIntentService extends IntentService implements MacroConstants{
                 Date date = calender.getTime();
                 weekDayDate = df.format(date);
             }
-            Cursor cursor = getContentResolver().query(MacroContract.MacroEntry.CONTENT_URI,
+            cursor = getContentResolver().query(MacroContract.MacroEntry.CONTENT_URI,
                     NutrientListActivity.MACRO_COLUMNS,
                     LOADER_DB_NAME_ARG + macroName + LOADER_ARG_CLOSE_QUOTE + " AND intake_date = '" + weekDayDate + "'",
                     null,
                     SORT_ORDER_LATEST_RECORD);
-            Log.e("ben","weekDayDate:" + weekDayDate);
-            if (cursor == null || (cursor != null && cursor.getCount() == 0)) {
-                Log.e("ben", "cursor was null :/");
+            if (cursor == null || cursor.getCount() == 0) {
                 intakeValues[i] = 0;
             } else {
-                Log.e("ben", "cursor not null!");
                 cursor.moveToFirst();
                 do {
-                    Log.e("ben", "cursor ID: " + cursor.getInt(COL_MACRO_ENTRY_ID) + " cursor macro name:" + cursor.getString(COL_MACRO_NAME) + " cursor date:" + cursor.getString(COL_INTAKE_DATE) + " cursor Value:" + cursor.getInt(COL_INTAKE_VALUE));
                     intakeValues[i] = cursor.getInt(COL_INTAKE_VALUE);
                 } while (cursor.moveToNext());
             }
         }
+        cursor.close();
         Intent broadcastIntent = new Intent();
         broadcastIntent.setAction(NutrientDetailFragment.ResponseReceiver.ACTION_RESP);
         broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);

@@ -99,7 +99,6 @@ public class NutrientListActivity extends AppCompatActivity implements LoaderMan
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
-        Log.i(LOG_TAG, "ben, onCreateOptionsMenu");
         return true;
     }
 
@@ -114,7 +113,6 @@ public class NutrientListActivity extends AppCompatActivity implements LoaderMan
         if (id == R.id.action_settings) {
             Intent intent = new Intent(getApplicationContext(), SettingsActivity.class);
             startActivity(intent);
-            Log.e(LOG_TAG,"ben, settings was clicked");
             return true;
         }
 
@@ -164,7 +162,7 @@ public class NutrientListActivity extends AppCompatActivity implements LoaderMan
         }
 
         MobileAds.initialize(this, "ca-app-pub-3940256099942544~3347511713");
-        mAdView = (AdView) findViewById(R.id.adView);
+        mAdView = findViewById(R.id.adView);
         AdRequest adRequest = new AdRequest.Builder()
             .addTestDevice("9C6380BFD6954AC62ACF1EE1D64BA0A1")
             .build();
@@ -181,17 +179,16 @@ public class NutrientListActivity extends AppCompatActivity implements LoaderMan
         textView_quadrant_four = findViewById(R.id.quadrant_four_text);
         update_button_quadrant_four = findViewById(R.id.quadrant_four_update_button);
 
-        //This will init a loader that will pull all rows
-        //getSupportLoaderManager().initLoader(MACRO_LOADER_ONE, null, this);
         Bundle bundle = new Bundle();
         sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         Set<String> selections = sharedPref.getStringSet("macro_pref_list",null);
 
         macro_pref_array = selections.toArray(macro_pref_array);
-        for(int loaderId = 0; loaderId < 4; loaderId++) {
-            Log.e(LOG_TAG,"macro_pref_array value:" + macro_pref_array[loaderId] + " at loader:" + loaderId);
-            bundle.putString(LOADER_ARG_BUNDLE_KEY_SELECTION, LOADER_DB_NAME_ARG + macro_pref_array[loaderId] + LOADER_ARG_CLOSE_QUOTE);
-            getSupportLoaderManager().initLoader(loaderId, bundle, this);
+        if(macro_pref_array != null) {
+            for (int loaderId = 0; loaderId < 4; loaderId++) {
+                bundle.putString(LOADER_ARG_BUNDLE_KEY_SELECTION, LOADER_DB_NAME_ARG + macro_pref_array[loaderId] + LOADER_ARG_CLOSE_QUOTE);
+                getSupportLoaderManager().initLoader(loaderId, bundle, this);
+            }
         }
     }
 
@@ -206,7 +203,6 @@ public class NutrientListActivity extends AppCompatActivity implements LoaderMan
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Log.e(LOG_TAG, "Ben Inside 'onActivityResult', requestCode:" + requestCode);
         // Result returned from launching the Intent from GoogleSignInClient.getSignInIntent(...);
         if (requestCode == RC_SIGN_IN) {
             // The Task returned from this call is always completed, no need to attach
@@ -223,7 +219,7 @@ public class NutrientListActivity extends AppCompatActivity implements LoaderMan
             String[] displayName = account.getDisplayName().split("\\s+");
 
             // Signed in successfully, show authenticated UI.
-            if(displayName[0] != null || !displayName[0].isEmpty()) {
+            if(displayName[0] != null && !displayName[0].isEmpty()) {
                 Toasty.success(this, getString(R.string.successful_signin) + displayName[0] + getString(R.string.exclamation), Toast.LENGTH_LONG).show();
             } else {
                 Toasty.success(this, getString(R.string.welcome), Toast.LENGTH_LONG).show();
@@ -231,7 +227,7 @@ public class NutrientListActivity extends AppCompatActivity implements LoaderMan
             signInButton.setVisibility(View.GONE);
             SharedPreferences.Editor editor = sharedPref.edit();
             editor.putString("display_name_text", displayName[0]);
-            editor.commit();
+            editor.apply();
         } catch (ApiException e) {
             // The ApiException status code indicates the detailed failure reason.
             // Please refer to the GoogleSignInStatusCodes class reference for more information.
@@ -258,27 +254,20 @@ public class NutrientListActivity extends AppCompatActivity implements LoaderMan
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        Log.e(LOG_TAG, "Ben in onLoadFinished, loader ID:" + loader.getId());
-        if(data == null || (data != null && data.getCount() == 0)){
-            Log.e(LOG_TAG, "Ben on results from loader, adding some!");
+        if(data == null ||  data.getCount() == 0){
             initDBInserts(loader.getId());
         }else{
-            Log.e(LOG_TAG, "Ben data getCount:" + data.getCount());
             data.moveToFirst();
             do{
                 if(!data.getString(COL_INTAKE_DATE).equalsIgnoreCase(currentDate)){
-                    Log.e("Ben","old record was found :(");
                     //Need to Insert a new record for today
                     initDBInserts(loader.getId());
                     continue;
                 }
                 updateUI(loader.getId(), data.getString(COL_MACRO_NAME), data.getInt(COL_INTAKE_VALUE));
-                Log.e(LOG_TAG, "Ben macro names:" + data.getString(COL_MACRO_NAME) + " record Date:" + data.getString(COL_INTAKE_DATE) + " record ID:" + data.getInt(COL_MACRO_ENTRY_ID) + " value:" + data.getInt(COL_INTAKE_VALUE));
             }while(data.moveToNext());
         }
     }
-
-    //This will be for when the user wants to launch the detail screen
 
     private void updateUI(final int loaderId, String name, final int value) {
         switch (loaderId) {
@@ -410,13 +399,11 @@ public class NutrientListActivity extends AppCompatActivity implements LoaderMan
 
     @Override
     public void onDialogPositiveClick(DialogFragment dialog, int value, int loaderId) {
-        Log.e(LOG_TAG,"ben in onDialogPositiveClick, value is...:" + value + ", loaderId:" + loaderId);
         updateDBIntakeValue(loaderId, value);
     }
 
     @Override
     public void onDialogNegativeClick(DialogFragment dialog) {
-        Log.e(LOG_TAG,"ben in onDialogNegativeClick");
     }
 
     private void updateDBIntakeValue(int loaderId, int value){
